@@ -1,0 +1,16 @@
+Body {
+  Font-family: Courier New, Courier;
+	background-color: rgb(232,243,246);}
+
+h2, h3 {
+	color: black;}
+
+p {
+	color: black;
+	font-weight: bold;}
+ol { 
+	color: white;}
+ul {
+	color: white;}
+dl {
+	color: white;}
