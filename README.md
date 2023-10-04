@@ -2,5 +2,5 @@
 # Domain:
 http://www.moviesdatadashboard.com/
 
-# Dashboard
+# Dataset:
 https://www.kaggle.com/datasets/rounakbanik/the-movies-dataset
