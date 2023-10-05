@@ -103,8 +103,8 @@ body, html {
 	text-align: right;}
 
 h2 {
-	font-size: 250%;
-	text-align: left;}
+	font-size: 100%;
+	text-align: center;}
 
 /* tabbing the second line of text over*/
 #tab {
@@ -155,17 +155,6 @@ h2 {
   opacity: 1.0;
 }
 
-/* Set a specific color for each brand */
-
-/* ORCID */
-.fa-orcid {
-  position: absolute;
-  background: black;
-  color: white;
-  top: 33%;
-  left: 15%;
-}
-
 /* GitHub */
 .fa-github {
   position: absolute;
@@ -173,33 +162,6 @@ h2 {
   color: white;
   top: 17%;
   left: 19%;
-}
-
-/* Reddit */
-.fa-reddit {
-  position: absolute;
-  background: black;
-  color: white;
-  top: 25%;
-  left: 15%;
-}
-
-/* Linkedin */
-.fa-linkedin {
-  position: absolute;
-  background: black;
-  color: white;
-  top: 25%;
-  left: 19%;
-}
-
-/* Email */
-.fa-envelope {
-  position: absolute;
-  background: black;
-  color: white;
-  top: 17%;
-  left: 15%;
 }
 
 /* Adding Footer to each page */
