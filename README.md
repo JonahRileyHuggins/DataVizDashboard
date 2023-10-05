@@ -1,6 +1,6 @@
 # DataVizDashboard
 # Domain:
-http://moviesdatadashboard.com/
+https://jonahrileyhuggins.github.io/DataVizDashboard/ 
 
 # Dataset:
 https://www.kaggle.com/datasets/rounakbanik/the-movies-dataset
