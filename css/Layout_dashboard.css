@@ -1,0 +1,43 @@
+
+/* Position text in the middle of the page/image */
+.Information {
+    background-color: rgba(255,255,255 1.0)
+    font-weight: bold;
+    font-family: Arial, Helvetica, sans-serif;
+    font-color: initial;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    padding: 55px;
+    height: 80%;
+    width: 80%;
+    text-align: left;
+    font-size: 120%;
+  }
+  
+  /* Container for the questions */
+  .question-container {
+    display: flex;
+    justify-content: space-between; /* Distribute child elements with equal space between them */
+    align-items: center; 
+    position: absolute;
+    top: calc(50% + 20px); /* Adjust the value to create space below the centered div */
+    left: 20%;
+    right: 20%;
+    text-align: left; /* Center-align the questions */
+  }
+  .question-container > div {
+    width: 30%; /* Adjust this value to create space between the questions */
+  }
+  
+  /* CSS for individual question elements */
+  .question {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 24px;
+      border: none;
+      background: none;
+  }
+  
+  
