@@ -1,6 +1,6 @@
 body, html {
   height: 100%;
-  Background-color: rgb(126, 169, 132);
+  Background-color: rgb(235, 238, 218);
 }
 
 * {
@@ -24,23 +24,6 @@ body, html {
   background-size: cover;
 }
 
-/* Position text in the middle of the page/image */
-
-.myDiv {
-  background-color: rgba(255,255,255 1.0)
-  font-weight: bold;
-  font-color: initial;
-  position: absolute;
-  top: 75%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 2;
-  padding: 55px;
-  height: 80%;
-  width: 80%;
-  text-align: center;
-  font-size: 120%;
-}
 /* Add a black background color to the top navigation */
 .topnav {
   background-color: #333;
@@ -68,7 +51,8 @@ body, html {
   background-color: #04AA6D;
   color: white;
 }
-.seentitle {
+
+.title {
   background-color: rgb(0,0,0); /* Fallback color */
   background-color: rgba(0,0,0, 0.0); /* Black w/opacity/see-through */
   color: white;
@@ -84,67 +68,22 @@ body, html {
   text-align: left;
   font-size: 1vw;
 }
-/*Adding the page title to the top nav bar area*/
 
-.resumeDiv {
-	text-align: right;}
-  
-/* tabbing the second line of text over*/
-#tab {
+/* Position text in the middle of the page/image */
+.Information {
+  background-color: rgba(255,255,255 1.0)
+  font-weight: bold;
+  font-color: initial;
   position: absolute;
-  margin-top: 50%;
-  margin-left: 45%;
-}
-
-/* moving regular text to center above Social media links */
-.tab2 { margin-left: 50px;
-        font-weight: bold;}
-
-
-/* placing picture on center screen, fill 80% */
-.container {
-  overflow: hidden;
-  position: absolute;
+  top: 75%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  padding: 55px;
+  height: 80%;
+  width: 80%;
   text-align: center;
-  color: white;
-  top: 15%;
-  left: 5%;
-  width: 90%;
-}
-
-.toptext {
-  overflow: hidden;
-  position: absolute;
-  top:40%;
-  left: 25%;
-  font-color: black;
-  font-size: 1.2vw;
-}
-
-/* Adding Social Media Icons, styling and positioning */
-.fa {
-  border-radius: 10px;
-  padding-top: 15px;
-  padding-bottom: 15px;
-  font-size: 30px;
-  width: 50px;
-  text-align: center;
-  text-decoration: none;
-  max-width: 100%;
-}
-
-/* Add a hover effect */
-.fa:hover {
-  opacity: 1.0;
-}
-
-/* GitHub */
-.fa-github {
-  position: absolute;
-  background: black;
-  color: white;
-  top: 17%;
-  left: 19%;
+  font-size: 120%;
 }
 
 /* Adding Footer to each page */
