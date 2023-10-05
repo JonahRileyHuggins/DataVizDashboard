@@ -22,7 +22,7 @@
   font-family: Arial, Helvetica, sans-serif;
   font-color: initial;
   position: absolute;
-  top: 60%;
+  top: calc(50% + 20px);
   left: 20%;
   right: 20%;
   width: 80%;
@@ -35,7 +35,7 @@
   justify-content: space-between; /* Distribute child elements with equal space between them */
   align-items: center; 
   position: absolute;
-  top: calc(50% + 20px); /* Adjust the value to create space below the centered div */
+  top: calc(60% + 20px); /* Adjust the value to create space below the centered div */
   left: 20%;
   right: 20%;
   text-align: left; /* Center-align the questions */
