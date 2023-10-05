@@ -17,13 +17,24 @@
     font-size: 120%;
   }
   
+  /* Position the background and motivation sections */
+  .BandM {
+    font-family: Arial, Helvetica, sans-serif;
+    font-color: initial;
+    position: absolute;
+    top: 60%;
+    left: 20%;
+    right: 20%;
+    width: 80%;
+    text-align: left;
+  }
   /* Container for the questions */
   .question-container {
     display: flex;
     justify-content: space-between; /* Distribute child elements with equal space between them */
     align-items: center; 
     position: absolute;
-    top: calc(50% + 20px); /* Adjust the value to create space below the centered div */
+    top: calc(60% + 20px); /* Adjust the value to create space below the centered div */
     left: 20%;
     right: 20%;
     text-align: left; /* Center-align the questions */
