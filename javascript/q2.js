@@ -4,6 +4,7 @@
     Answer the following question: How does the profitability of a film relate to the viewer ratings of the film?
 */
 
+
 d3.csv("revenueVsRatings.csv").then(function(data) {
   // Define dimensions
   const dimensions = {
