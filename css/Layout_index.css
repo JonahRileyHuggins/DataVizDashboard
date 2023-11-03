@@ -67,7 +67,6 @@
 /*data paragraph*/
 .data {
   font-family: Arial, Helvetica, sans-serif;
-  font-color: initial;
   position: absolute;
   top: calc(105% + 20px);
   left: 20%;
@@ -75,7 +74,7 @@
   text-align: left;
   font-size: 20px;
 }
-/* adding in a scrollable view of our dataset. */
+/* adding in a scrollable view of our dataset.
 .dataset-container {
   position: absolute;
   top: calc(120% + 20px);
@@ -86,6 +85,6 @@
   overflow: scroll;
   height: 200px;
   width: 60%;
-}
+} */
 
 
