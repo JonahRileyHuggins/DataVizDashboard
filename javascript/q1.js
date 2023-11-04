@@ -44,9 +44,9 @@ d3.csv("/DataVizDashboard/data/movies_metadata.csv").then(
         //Create axes
         const tickSize = 10;
         const minYear = d3.min(rev_data, function(d) { return +d[0] })
-        const tickMin = minYear + 10 - minYear%10;
+        const tickMin = minYear + tickSize - minYear%tickSize;
         const maxYear = d3.max(rev_data, function(d) { return +d[0] })
-        const tickMax = maxYear - maxYear%10;
+        const tickMax = maxYear - maxYear%tickSize;
         const tickVals = Array.from({length: (tickMax - tickMin)/ tickSize + 1}, (value, index) => new Date(tickMin + index*tickSize, 0 , 1));
         const xAxis = d3.axisBottom(xScale).tickValues(tickVals);
         const xAxisGroup = svg.append("g")
