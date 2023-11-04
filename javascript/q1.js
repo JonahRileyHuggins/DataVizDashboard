@@ -15,8 +15,6 @@ d3.csv("/DataVizDashboard/data/movies_metadata.csv").then(
         //Aggregate data by year
         const rev_data = d3.rollup(sort_data, (v) => d3.sum(v, (d) => +d.revenue), (d) => d.release_year);
 
-        console.log(rev_data)
-
         const dimensions = {
             width: 800,
             height: 400,
@@ -44,11 +42,12 @@ d3.csv("/DataVizDashboard/data/movies_metadata.csv").then(
                           .range([ dimensions.height-dimensions.margin.bottom,  dimensions.margin.top]);
      
         //Create axes
-        const minYear = d3.min(rev_data, function(d) { return +d[0] }) + 10 - d3.min(rev_data, function(d) { return +d[0] })%10;
-        const maxYear = d3.max(rev_data, function(d) { return +d[0] }) + 10 - d3.max(rev_data, function(d) { return +d[0] })%10;
         const tickSize = 10;
-        const tickVals = Array.from({length: (maxYear - minYear)/ tickSize + 1}, (value, index) => new Date(minYear + index*tickSize, 0 , 1));
-        console.log(tickVals);
+        const minYear = d3.min(rev_data, function(d) { return +d[0] })
+        const tickMin = minYear + 10 - minYear%10;
+        const maxYear = d3.max(rev_data, function(d) { return +d[0] })
+        const tickMax = maxYear - maxYear%10;
+        const tickVals = Array.from({length: (tickMax - tickMin)/ tickSize + 1}, (value, index) => new Date(tickMin + index*tickSize, 0 , 1));
         const xAxis = d3.axisBottom(xScale).tickValues(tickVals);
         const xAxisGroup = svg.append("g")
                               .call(xAxis)
