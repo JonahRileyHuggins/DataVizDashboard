@@ -3,7 +3,17 @@
     Visual script
     Answer the following question: How does the profitability of a film relate to the viewer ratings of the film?
 */
-d3.csv("javascript/average_revenue_by_rating.csv").then(function(data) {
+d3.csv("data/revenueVsRatings.csv").then(function(data) {
+  // Calculate average revenue per rating
+  const averageRevenueByRating = d3.rollup(
+    data,
+    v => d3.mean(v, d => +d.revenue),
+    d => +d.rating
+  );
+
+  // Convert the rollup result into an array of objects
+  const averageRevenueData = Array.from(averageRevenueByRating, ([rating, avgRevenue]) => ({ rating, avgRevenue }));
+
   // Define dimensions
   const dimensions = {
     width: 800,
@@ -22,23 +32,23 @@ d3.csv("javascript/average_revenue_by_rating.csv").then(function(data) {
     .style("height", dimensions.height + "px");
 
   // Define x and y accessors
-  const xAccessor = d => d.rating;
-  const yAccessor = d => d.revenue;
+  const xAccessor = d => +d.rating; // Convert rating to a number
+  const yAccessor = d => +d.avgRevenue; // Use the calculated average revenue
 
   // Create scales
   const xScale = d3.scaleBand()
-    .domain(data.map(xAccessor))
+    .domain([0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]) // Set the domain to numerical ratings
     .range([dimensions.margin.left, dimensions.width - dimensions.margin.right])
     .padding(0.1);
 
   const yScale = d3.scaleLinear()
-    .domain([0, d3.max(data, yAccessor)])
+    .domain([0, d3.max(averageRevenueData, yAccessor)])
     .nice()
     .range([dimensions.height - dimensions.margin.bottom, dimensions.margin.top]);
 
   // Create the bars
   const bars = svg.selectAll("rect")
-    .data(data)
+    .data(averageRevenueData)
     .enter()
     .append("rect")
     .attr("x", d => xScale(xAccessor(d)))
@@ -60,23 +70,22 @@ d3.csv("javascript/average_revenue_by_rating.csv").then(function(data) {
     .style("transform", `translateX(${dimensions.margin.left}px`)
     .attr("color", "black");
 
-      // Add X-axis label
+  // Add X-axis label
   svg.append("text")
     .text("Rating")
     .attr("x", dimensions.width / 2)
-    .attr("y", dimensions.height - 10) // Adjust the Y position
+    .attr("y", dimensions.height - 10)
     .attr("text-anchor", "middle")
     .attr("font-size", "14px")
     .attr("fill", "black");
 
-// Add Y-axis label
+  // Add Y-axis label
   svg.append("text")
     .text("Average Revenue")
-    .attr("x", -dimensions.height / 2) // Rotate the text for vertical orientation
-    .attr("y", 15) // Adjust the Y position
+    .attr("x", -dimensions.height / 2)
+    .attr("y", 15)
     .attr("text-anchor", "middle")
     .attr("font-size", "14px")
     .attr("fill", "black")
-    .attr("transform", "rotate(-90)"); // Rotate the text for vertical orientation
-
+    .attr("transform", "rotate(-90)");
 });
