@@ -1,4 +1,4 @@
-d3.csv("profit_by_genre.csv").then(function(dataset) 
+d3.csv("/DataVizDashboard/javascript/profit_by_genre.csv").then(function(dataset) 
 	{
 		const dimensions = {
 			width: 800,
