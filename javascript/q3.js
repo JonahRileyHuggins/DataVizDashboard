@@ -54,6 +54,21 @@ d3.csv("/DataVizDashboard/javascript/profit_by_genre.csv").then(function(dataset
 										.style("transform", `translateX(${dimensions.margin.left}px`)
 										.attr("color", "black")
 
+		svg.append("text")
+			.text("Budget")
+			.attr("x", dimensions.width / 2)
+			.attr("y", dimensions.height - 5)
+			.attr("text-anchor", "middle")
+			.attr("font-size", "14px")
+
+		svg.append("text")
+			.text("Revenue")
+			.attr("x", -dimensions.height / 2)
+			.attr("y", dimensions.margin.left / 3)
+			.attr("text-anchor", "middle")
+			.attr("font-size", "14px")
+			.attr("transform", "rotate(-90)")
+
       const legend = d3.select("#q3legend")
 									.style("width", dimensions.width)
 									.style("height", dimensions.height/6)
