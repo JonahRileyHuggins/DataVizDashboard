@@ -1,76 +1,82 @@
-/*
-    **q3.js**
-    Visual script
-    Answer the following question: What qualitative factors affect the profitability of a film?
-*/
+d3.csv("profit_by_genre.csv").then(function(dataset) 
+	{
+		const dimensions = {
+			width: 800,
+			height: 400,
+			margin: {
+				top: 40,
+				right: 15,
+				bottom: 50,
+				left: 115,
+			},
+		}
 
-// Adding as scatterplot, might be useful later
+		const svg = d3.select("#q3scatterplot")
+			.style("width", dimensions.width)
+			.style("height", dimensions.height)
 
-// d3.csv("javascript/average_revenue_by_rating.csv").then(function(data) {
-//   console.log(data);
-//   // Define dimensions
-//   const dimensions = {
-//   width: 800,
-//   height: 400,
-//   margin: {
-//       top: 20,
-//       right: 5,
-//       bottom: 20,
-//       left: 60,
-//       },
-//     };
+		const colors = ["red", "blue", "green", "orange", "purple", 
+							"maroon", "brown", "steelblue", "pink", "black", 
+							"gray", "aquamarine", "coral", "darkgoldenrod", "darkseagreen",
+							"greenyellow", "olive", "indigo", "lavender", "mediumslateblue"]
 
-//   // Append an SVG element to your HTML
-//   const svg = d3.select("#barchart")
-//     .style("width", dimensions.width)
-//     .style("height", dimensions.height)
+		//budget is X
+ 		var xScale = d3.scaleLinear()
+								.domain(d3.extent(dataset, d => +d.bud))
+								.range([dimensions.margin.left, dimensions.width-dimensions.margin.right])
+ 
+ 		//revenue is Y
+  		var yScale = d3.scaleLinear()
+								.domain(d3.extent(dataset, d => +d.rev))
+								.range([dimensions.height - dimensions.margin.top, dimensions.margin.bottom])
 
-//   const xAccessor = d => d.rating;
-//   const yAccessor = d => d.revenue;
-    
+		console.log(d3.extent(dataset, d => +d.bud))
 
-//   const xScale = d3.scaleLinear()
-//     .domain(d3.extent(data,xAccessor))
-//     .range([dimensions.margin.left,dimensions.width-dimensions.margin.right])
+		var dots = svg.append("g")
+								.selectAll("circle")
+								.data(dataset)
+								.enter()
+								.append("circle")
+								.attr("cx", d => xScale(d.bud))
+								.attr("cy", d => yScale(d.rev))
+								.attr("r", 5)
+								.attr("fill", function(d, i){return colors[i]})
 
-//   const yScale = d3.scaleLinear()
-//     .domain(d3.extent(data,yAccessor))
-//     .range([dimensions.height-dimensions.margin.bottom,dimensions.margin.top])
+		const xAxis = d3.axisBottom().scale(xScale)
+		const xAxisGroup = svg.append("g")
+										.call(xAxis)
+										.style("transform", `translateY(${dimensions.height - dimensions.margin.bottom*0.8}px`)
+										.attr("color", "black")
 
-// // Define dots to be plotted
-//   // const dots = svg.append("g")
-//   //   .selectAll("circle")
-//   //   .data(data)
-//   //   .enter()
-//   //   .append("circle")
-//   //   .attr("cx", d => xScale(xAccessor(d)))
-//   //   .attr("cy", d => yScale(yAccessor(d)))
-//   //   .attr("fill", "blue")
-//   //   .attr("r", 3)
+		const yAxis = d3.axisLeft().scale(yScale)
+		const yAxisGroup = svg.append("g")
+										.call(yAxis)
+										.style("transform", `translateX(${dimensions.margin.left}px`)
+										.attr("color", "black")
 
-//   const rect = svg.append("g") 
-//     .selectAll("rect")
-//     .data(data)
-//     .enter()
-//     .append("rect")
-//     .attr("x", d => xScale(xAccessor(d)))
-//     .attr("y", d => yScale(yAccessor(d))
-//     .attr("width", xScale.bandwidth())
-//     .attr("height", d => height - yScale(d.value))
-//     .attr("fill", "blue");
+      const legend = d3.select("#q3legend")
+									.style("width", dimensions.width)
+									.style("height", dimensions.height/6)
 
-
-// // Define the x and y axes
-//   const xAxis = d3.axisBottom().scale(xScale)
-//   const xAxisGroup = svg.append("g")
-//     .call(xAxis)
-//     .style("transform", `translateY(${dimensions.height-dimensions.margin.bottom}px)`)
-//     .attr("color", "black")
-
-//   const yAxis = d3.axisLeft().scale(yScale)
-//   const yAxisGroup = svg.append("g")
-//     .call(yAxis)
-//     .style("transform", `translateX(${dimensions.margin.left}px)`)
-//     .attr("color", "black")
-
-//   });
+		var rects = legend.append("g")
+									.selectAll("rect")
+									.data(dataset)
+									.enter()
+									.append("rect")
+									.attr("y", 0)
+									.attr("x", function(d, i){return dimensions.width*i/20})
+									.attr("width", 18)
+									.attr("height", 18)
+									.attr("fill", function(d, i){return colors[i]})
+	
+   	var labels = legend.append("g")
+									.selectAll("text")
+									.data(dataset)
+									.enter()
+									.append("text")
+									.style("font-size", "7px")
+									.attr("y", dimensions.height/12)
+									.attr("x", function(d, i){return dimensions.width*i/20})
+									.text(d => d.primary_genre)
+	}
+)
