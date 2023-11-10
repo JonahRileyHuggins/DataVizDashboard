@@ -10,10 +10,10 @@ d3.csv("data/revenueVsRatings.csv").then(function(data) {
     v => d3.mean(v, d => +d.revenue),
     d => +d.rating
   );
-
+  console.log(data)
   // Convert the rollup result into an array of objects
   const averageRevenueData = Array.from(averageRevenueByRating, ([rating, avgRevenue]) => ({ rating, avgRevenue }));
-
+  console.log(averageRevenueData)
   // Define dimensions
   const dimensions = {
     width: 800,
