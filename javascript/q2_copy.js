@@ -3,7 +3,7 @@
     Visual script
     Answer the following question: How does the profitability of a film relate to the viewer ratings of the film?
 */
-d3.csv("data/revenueVsRatings.csv").then(function(data) {
+d3.json("data/revenue_by_rating_and_genre.json").then(function(data) {
   const dimensions = {
     width: 800,
     height: 400,
@@ -15,61 +15,23 @@ d3.csv("data/revenueVsRatings.csv").then(function(data) {
     },
   };
 
-  // Create a nested structure grouped by rating and genre
-  const nestedData = d3.group(data, d => +d.rating, d => d.genre);
+  // console.log(data)
 
-  // Calculate the average revenue for each genre within each rating group
-  const averageRevenues = new Map();
-
-  // Loop through each rating group
-  for (const [rating, genreMap] of nestedData) {
-    const genreAverages = new Map();
-
-    // Loop through each genre within the rating group
-    for (const [genre, movies] of genreMap) {
-      // Calculate the average revenue for the genre
-      const totalRevenue = d3.sum(movies, d => +d.revenue);
-      console.log(totalRevenue)
-      const averageRevenue = totalRevenue / movies.length;
-      console.log(averageRevenue)
-      // Store the average revenue for the genre
-      genreAverages.set(genre, averageRevenue);
-      console.log(genreAverages)
-    }
-
-    // Store the genre averages for the rating group
-    averageRevenues.set(rating, genreAverages);
-
+  function value(d, key) {
+    return d[key];
   }
 
-  const flattenedData = Array.from(averageRevenues).flatMap(([rating, genreAverages]) => {
-    return Array.from(genreAverages).map(([genre, value]) => {
-      return {
-        rating: rating,
-        genre: genre,
-        revenue: value
-      };
-    });
-  });
-  const filteredData = flattenedData.filter(entry => entry.genre !== "");
+  // Example: Indexing rating values
+const ratingIndex = data.map(item => value(item, 'average_revenue'));
 
-  const cleanedData = filteredData.map(entry => ({
-    rating: parseFloat(entry.rating),
-    genre: entry.genre,
-    revenue: parseFloat(entry.revenue),
-  }));
-  console.log(cleanedData)
+console.log("Rating values index:", ratingIndex);
+  const series = d3.stack()
+    .keys(d3.union(data.map(d => d.genre))) // apples, bananas, cherries, …
+    // .value(data, d => d.average_revenue)
+  (data);
 
+ console.log(series)
 
-  const genreKeys = filteredData.map(entry => entry.genre);
-  const keys = [...new Set(genreKeys)];
-  console.log(keys)
-
-  // const stackedData = d3.stack()
-  // .keys(keys) // Extract keys from the dataset excluding the first two (genre and id)
-  // .value(([, group], key) => group.get(key).revenue)
-  // (d3.index(cleanedData, d => d.rating, d => d.genre));
-  // console.log(stackedData)
 
 
   // Define the x and y axes
@@ -92,7 +54,7 @@ d3.csv("data/revenueVsRatings.csv").then(function(data) {
     .padding(0.1);
 
   const yScale = d3.scaleLinear()
-    .domain([0, d3.max(filteredData, d => +d.revenue)])
+    .domain([0, d3.max(data, d => +d.revenue)])
     .nice()
     .range([dimensions.height - dimensions.margin.bottom, dimensions.margin.top]);
 
@@ -110,7 +72,7 @@ d3.csv("data/revenueVsRatings.csv").then(function(data) {
 
   // Create the stacked bars
   svg.selectAll(".bar")
-    .data(Array.from(averageRevenues.keys()))
+    .data(Array.from(data.keys()))
     .enter().append("g")
     .attr("class", "bar")
     .attr("fill", d => colorScale(d))
@@ -118,7 +80,7 @@ d3.csv("data/revenueVsRatings.csv").then(function(data) {
     .data(d => genres.map(genre => ({
       rating: d,
       genre: genre,
-      value: averageRevenues.get(d).get(genre) || 0,
+      value: data.get(d).get(genre) || 0,
     })))
     // .enter().append("rect")
     // .attr("x", d => xScale(d.rating))
