@@ -27,8 +27,8 @@ const ratingIndex = data.map(item => value(item, 'average_revenue'));
 console.log("Rating values index:", ratingIndex);
   const series = d3.stack()
     .keys(d3.union(data.map(d => d.genre))) // apples, bananas, cherries, …
-    // .value(data, d => d.average_revenue)
-  (data);
+    .value(data, d => d.average_revenue)
+  (d3.index(data, d => d.rating, d => d.genre));
 
  console.log(series)
 
