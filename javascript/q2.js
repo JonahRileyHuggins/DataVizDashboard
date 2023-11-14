@@ -3,18 +3,7 @@
     Visual script
     Answer the following question: How does the profitability of a film relate to the viewer ratings of the film?
 */
-d3.csv("data/revenueVsRatings.csv").then(function(data) {
-  // Calculate average revenue per rating
-  const averageRevenueByRating = d3.rollup(
-    data,
-    v => d3.mean(v, d => +d.revenue),
-    d => +d.rating
-  );
-  console.log(data)
-  // Convert the rollup result into an array of objects
-  const averageRevenueData = Array.from(averageRevenueByRating, ([rating, avgRevenue]) => ({ rating, avgRevenue }));
-  console.log(averageRevenueData)
-  // Define dimensions
+d3.json("data/revenue_by_rating_and_genre.json").then(function(data) {
   const dimensions = {
     width: 800,
     height: 400,
@@ -26,66 +15,75 @@ d3.csv("data/revenueVsRatings.csv").then(function(data) {
     },
   };
 
-  // Append an SVG element to your HTML
+  // console.log(data)
+
+  // Indexing rating values
+const ratingIndex = data.map(item => value(item, 'average_revenue'));
+
+console.log("Rating values index:", ratingIndex);
+  const series = d3.stack()
+    .keys(d3.union(data.map(d => d.genre))) // apples, bananas, cherries, …
+    .value(data, d => d.average_revenue)
+  (d3.index(data, d => d.rating, d => d.genre));
+
+ console.log(series)
+
+
+
+  // Define the x and y axes
   const svg = d3.select("#barchart")
     .style("width", dimensions.width + "px")
     .style("height", dimensions.height + "px");
 
-  // Define x and y accessors
-  const xAccessor = d => +d.rating; // Convert rating to a number
-  const yAccessor = d => +d.avgRevenue; // Use the calculated average revenue
+  // Extract all genres from the data
+  const genres = Array.from(new Set(data.map(d => d.genres)));
 
-  // Create scales
+  // Define a color scale for the genres
+  const colorScale = d3.scaleOrdinal()
+    .domain(genres)
+    .range(d3.schemeCategory10);
+
+  // Define the x-axis scale for ratings
   const xScale = d3.scaleBand()
     .domain([0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]) // Set the domain to numerical ratings
     .range([dimensions.margin.left, dimensions.width - dimensions.margin.right])
     .padding(0.1);
 
   const yScale = d3.scaleLinear()
-    .domain([0, d3.max(averageRevenueData, yAccessor)])
+    .domain([0, d3.max(data, d => +d.revenue)])
     .nice()
     .range([dimensions.height - dimensions.margin.bottom, dimensions.margin.top]);
 
-  // Create the bars
-  const bars = svg.selectAll("rect")
-    .data(averageRevenueData)
-    .enter()
-    .append("rect")
-    .attr("x", d => xScale(xAccessor(d)))
-    .attr("y", d => yScale(yAccessor(d)))
-    .attr("width", xScale.bandwidth())
-    .attr("height", d => dimensions.height - dimensions.margin.bottom - yScale(yAccessor(d)))
-    .attr("fill", "blue");
+  // Create the x-axis
+  svg.append("g")
+    .attr("class", "x-axis")
+    .attr("transform", "translate(0," + (dimensions.height - dimensions.margin.bottom) + ")")
+    .call(d3.axisBottom(xScale));
 
-  // Define the x and y axes
-  const xAxis = d3.axisBottom(xScale);
-  const xAxisGroup = svg.append("g")
-    .call(xAxis)
-    .style("transform", `translateY(${dimensions.height - dimensions.margin.bottom}px)`)
-    .attr("color", "black");
+  // Create the y-axis
+  svg.append("g")
+    .attr("class", "y-axis")
+    .attr("transform", "translate(" + dimensions.margin.left + ",0)")
+    .call(d3.axisLeft(yScale));
 
-  const yAxis = d3.axisLeft(yScale);
-  const yAxisGroup = svg.append("g")
-    .call(yAxis)
-    .style("transform", `translateX(${dimensions.margin.left}px`)
-    .attr("color", "black");
+  // Create the stacked bars
+  svg.selectAll(".bar")
+    .data(Array.from(data.keys()))
+    .enter().append("g")
+    .attr("class", "bar")
+    .attr("fill", d => colorScale(d))
+    .selectAll("rect")
+    .data(d => genres.map(genre => ({
+      rating: d,
+      genre: genre,
+      value: data.get(d).get(genre) || 0,
+    })))
+    // .enter().append("rect")
+    // .attr("x", d => xScale(d.rating))
+    // .attr("y", d => yScale(d.value))
+    // .attr("height", d => yScale(d.value))
+    // .attr("width", xScale.bandwidth());
 
-  // Add X-axis label
-  svg.append("text")
-    .text("Rating")
-    .attr("x", dimensions.width / 2)
-    .attr("y", dimensions.height - 10)
-    .attr("text-anchor", "middle")
-    .attr("font-size", "14px")
-    .attr("fill", "black");
+  // 
 
-  // Add Y-axis label
-  svg.append("text")
-    .text("Average Revenue")
-    .attr("x", -dimensions.height / 2)
-    .attr("y", 15)
-    .attr("text-anchor", "middle")
-    .attr("font-size", "14px")
-    .attr("fill", "black")
-    .attr("transform", "rotate(-90)");
 });
