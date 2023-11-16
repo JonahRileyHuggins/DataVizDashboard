@@ -3,87 +3,161 @@
     Visual script
     Answer the following question: How does the profitability of a film relate to the viewer ratings of the film?
 */
-d3.json("data/revenue_by_rating_and_genre.json").then(function(data) {
-  const dimensions = {
+
+// Load the CSV data
+d3.csv('data/q2_data.csv').then(function(data) {
+
+  var dimensions = {
     width: 800,
     height: 400,
     margin: {
-      top: 40,
-      right: 0,
+      top: 50,
+      right: 10,
       bottom: 50,
-      left: 115,
-    },
-  };
+      left: 10,
+      }
+    }
 
-  // console.log(data)
-
-  // Indexing rating values
-const ratingIndex = data.map(item => value(item, 'average_revenue'));
-
-console.log("Rating values index:", ratingIndex);
-  const series = d3.stack()
-    .keys(d3.union(data.map(d => d.genre))) // apples, bananas, cherries, …
-    .value(data, d => d.average_revenue)
-  (d3.index(data, d => d.rating, d => d.genre));
-
- console.log(series)
-
-
-
-  // Define the x and y axes
-  const svg = d3.select("#barchart")
+  var svg = d3.select("#barchart")
     .style("width", dimensions.width + "px")
     .style("height", dimensions.height + "px");
 
-  // Extract all genres from the data
-  const genres = Array.from(new Set(data.map(d => d.genres)));
+  var tooltip = d3.select("barchart")
+    .append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
 
-  // Define a color scale for the genres
-  const colorScale = d3.scaleOrdinal()
-    .domain(genres)
-    .range(d3.schemeCategory10);
-
-  // Define the x-axis scale for ratings
-  const xScale = d3.scaleBand()
-    .domain([0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]) // Set the domain to numerical ratings
+  var xScale = d3.scaleBand()
+    .domain(d3.map(data, d => +d.rating))
     .range([dimensions.margin.left, dimensions.width - dimensions.margin.right])
-    .padding(0.1);
+    .padding(0.2)
 
-  const yScale = d3.scaleLinear()
-    .domain([0, d3.max(data, d => +d.revenue)])
-    .nice()
+  var keys = data.columns.slice(2);
+  console.log(keys)
+
+  var maximum = d3.max(data, function (d){ 
+    var sumName = 0
+    for (var i = 0; i < keys.length; i++) {
+      sumName = sumName + parseFloat(d[keys[i]])
+    }
+    return sumName
+  })
+
+  var yScale = d3.scaleLinear()
+    .domain([0, maximum])
     .range([dimensions.height - dimensions.margin.bottom, dimensions.margin.top]);
+  console.log(yScale)
 
-  // Create the x-axis
+  var colorScale = d3.scaleOrdinal()
+    .domain(keys)
+    .range(d3.schemeCategory10)
+
+  var stackedData = d3.stack()
+    .keys(keys)
+    (data)
+  
+  // console.log(d3.select(this).datum().key
+
+  // var mouseover = function(d) {
+  //   var subgroupName = d3.select(this).datum().key;
+  //   var reversedKeys = keys.reverse(); // Reverse the keys here
+  //   var subgroupValue = d.data[reversedKeys[0]]; // Use reversed key to access data
+  //   tooltip
+  //       .html("subgroup: " + subgroupName + "<br>" + "Value: " + subgroupValue)
+  //       .style("opacity", 1);
+  // }
+    
+    var mousemove = function(d) {
+      tooltip
+        .style("left", (d3.pointer(this)[0]+90) + "px") // It is important to put the +90: other wise the tooltip is exactly where the point is an it creates a weird effect
+        .style("top", (d3.pointer(this)[1]) + "px")
+    }
+    var mouseleave = function(d) {
+      tooltip
+        .style("opacity", 0)
+    }
+
+
+  var bars = svg.append("g")
+    .selectAll("g")
+    .data(stackedData)
+    .enter()
+    .append("g")
+    .attr("fill", d => colorScale(d.key))
+    .selectAll("rect")
+    .data(function (d) {return d;})
+    .enter()
+    .append("rect")
+    .attr("x", d => xScale(+d.data.rating))
+    .attr("y", d => yScale(+d[1]))
+    .attr("height", d => yScale(+d[0]) - yScale(+d[1]))
+    .attr("width", d => xScale.bandwidth())
+    .attr("stroke", "white")
+    .on("mouseover", function(d) {
+      d3.select(this)
+      .attr("stroke", "black")
+      .attr("stroke-width", 2)
+      var subgroupName = d3.select(this.parentNode).datum().key;
+      var subgroupValue = d.data[subgroupName];
+      tooltip
+          .html("subgroup: " + subgroupName + "<br>" + "Value: " + subgroupValue)
+          .style("opacity", 1);
+      
+
+    })
+    .on("mouseout", function(d) {
+      d3.select(this)
+      .attr("stroke", "with")
+      .attr("stroke-width", 0)
+    })
+
+
+      // Add x-axis
   svg.append("g")
-    .attr("class", "x-axis")
     .attr("transform", "translate(0," + (dimensions.height - dimensions.margin.bottom) + ")")
     .call(d3.axisBottom(xScale));
 
-  // Create the y-axis
+  // Add y-axis
   svg.append("g")
-    .attr("class", "y-axis")
     .attr("transform", "translate(" + dimensions.margin.left + ",0)")
     .call(d3.axisLeft(yScale));
 
-  // Create the stacked bars
-  svg.selectAll(".bar")
-    .data(Array.from(data.keys()))
+  // Add x-axis label
+  svg.append("text")
+    .attr("transform", "translate(" + (dimensions.width / 2) + " ," +
+      (dimensions.height - dimensions.margin.bottom + 40) + ")")
+    .style("text-anchor", "middle")
+    .text("Rating");
+
+  // Add y-axis label
+  svg.append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 0 - dimensions.margin.left)
+    .attr("x", 0 - (dimensions.height / 2))
+    .attr("dy", "1em")
+    .style("text-anchor", "middle")
+    .text("Total Revenue");
+
+
+  var legend = svg.append("g")
+    .attr("transform", "translate(" + (dimensions.width - dimensions.margin.right - 100) + "," + dimensions.margin.top + ")")
+    .selectAll(".legend")
+    .data(keys.reverse()) // Reverse the order to match the color scale
     .enter().append("g")
-    .attr("class", "bar")
-    .attr("fill", d => colorScale(d))
-    .selectAll("rect")
-    .data(d => genres.map(genre => ({
-      rating: d,
-      genre: genre,
-      value: data.get(d).get(genre) || 0,
-    })))
-    // .enter().append("rect")
-    // .attr("x", d => xScale(d.rating))
-    // .attr("y", d => yScale(d.value))
-    // .attr("height", d => yScale(d.value))
-    // .attr("width", xScale.bandwidth());
+    .attr("class", "legend")
+    .attr("transform", function (d, i) { return "translate(0," + i * 20 + ")"; });
 
-  // 
+  legend.append("rect")
+    .attr("x", 0)
+    .attr("width", 9)
+    .attr("height", 9)
+    .style("fill", colorScale);
 
-});
+  legend.append("text")
+    .attr("x", 25)
+    .attr("y", 9)
+    .attr("dy", ".35em")
+    .style("text-anchor", "start")
+    .text(function (d) { return d; });
+
+  });
