@@ -67,15 +67,15 @@ d3.csv('data/q2_data.csv').then(function(data) {
   //       .style("opacity", 1);
   // }
     
-    var mousemove = function(d) {
-      tooltip
-        .style("left", (d3.pointer(this)[0]+90) + "px") // It is important to put the +90: other wise the tooltip is exactly where the point is an it creates a weird effect
-        .style("top", (d3.pointer(this)[1]) + "px")
-    }
-    var mouseleave = function(d) {
-      tooltip
-        .style("opacity", 0)
-    }
+    // var mousemove = function(d) {
+    //   tooltip
+    //     .style("left", (d3.pointer(this)[0]+90) + "px") // It is important to put the +90: other wise the tooltip is exactly where the point is an it creates a weird effect
+    //     .style("top", (d3.pointer(this)[1]) + "px")
+    // }
+    // var mouseleave = function(d) {
+    //   tooltip
+    //     .style("opacity", 0)
+    // }
 
 
   var bars = svg.append("g")
@@ -93,23 +93,23 @@ d3.csv('data/q2_data.csv').then(function(data) {
     .attr("height", d => yScale(+d[0]) - yScale(+d[1]))
     .attr("width", d => xScale.bandwidth())
     .attr("stroke", "white")
-    .on("mouseover", function(d) {
-      d3.select(this)
-      .attr("stroke", "black")
-      .attr("stroke-width", 2)
-      var subgroupName = d3.select(this.parentNode).datum().key;
-      var subgroupValue = d.data[subgroupName];
-      tooltip
-          .html("subgroup: " + subgroupName + "<br>" + "Value: " + subgroupValue)
-          .style("opacity", 1);
+    // .on("mouseover", function(d) {
+    //   d3.select(this)
+    //   .attr("stroke", "black")
+    //   .attr("stroke-width", 2)
+    //   var subgroupName = d3.select(this.parentNode).datum().key;
+    //   var subgroupValue = d.data[subgroupName];
+    //   tooltip
+    //       .html("subgroup: " + subgroupName + "<br>" + "Value: " + subgroupValue)
+    //       .style("opacity", 1);
       
 
-    })
-    .on("mouseout", function(d) {
-      d3.select(this)
-      .attr("stroke", "with")
-      .attr("stroke-width", 0)
-    })
+    // })
+    // .on("mouseout", function(d) {
+    //   d3.select(this)
+    //   .attr("stroke", "with")
+    //   .attr("stroke-width", 0)
+    // })
 
 
       // Add x-axis
