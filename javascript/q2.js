@@ -50,7 +50,7 @@ d3.csv('data/q2_data.csv').then(function(data) {
     (data)
 
   var Tooltip = d3.select("#barchart")
-    .append("div")
+    .append("svg")
     .style("opacity", 0)
     .attr("class", "tooltip")
     .style("background-color", "white")
@@ -72,7 +72,7 @@ d3.csv('data/q2_data.csv').then(function(data) {
     var key = keys[i]; // Get the key for the current bar
     Tooltip
     d3.select(this)
-        .html("Genre: " +  xScale(+d.data.rating)) // Update the tooltip content with the key
+        .html("Genre: " +  key) // Update the tooltip content with the key
         .style("left", (d3.pointer(this)[0] + 70) + "px")
         .style("top", (d3.pointer(this)[1]) + "px");
   }
