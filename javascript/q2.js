@@ -67,7 +67,6 @@ d3.csv('data/q2_data.csv').then(function(data) {
       .style("stroke", "black")
       .style("opacity", 1)
   }
-  
   var mousemove = function(d, i) {
     var key = keys[i]; // Get the key for the current bar
     Tooltip
@@ -102,7 +101,7 @@ d3.csv('data/q2_data.csv').then(function(data) {
     .attr("height", d => yScale(+d[0]) - yScale(+d[1]))
     .attr("width", d => xScale.bandwidth())
     .attr("stroke", "white")
-    //Our new hover effects
+      //Our new hover effects
     .on("mouseover", mouseover)
     .on("mousemove", mousemove)
     .on("mouseleave", mouseleave)
