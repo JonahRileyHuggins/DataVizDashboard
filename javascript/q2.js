@@ -11,9 +11,9 @@ d3.csv('data/q2_data.csv').then(function(data) {
     height: 400,
     margin: {
       top: 50,
-      right: 10,
+      right: 50,
       bottom: 50,
-      left: 10,
+      left: 50,
       }
     }
 
@@ -49,6 +49,44 @@ d3.csv('data/q2_data.csv').then(function(data) {
     .keys(keys)
     (data)
 
+  var Tooltip = d3.select("#barchart")
+    .append("div")
+    .style("opacity", 0)
+    .attr("class", "tooltip")
+    .style("background-color", "white")
+    .style("border", "solid")
+    .style("border-width", "2px")
+    .style("border-radius", "5px")
+    .style("padding", "5px")
+
+  // Three function that change the tooltip when user hover / move / leave a cell
+  var mouseover = function(d) {
+    Tooltip
+      .style("opacity", 1)
+    d3.select(this)
+      .style("stroke", "black")
+      .style("opacity", 1)
+  }
+  
+  var mousemove = function(d, i) {
+    var key = keys[i]; // Get the key for the current bar
+    Tooltip
+    d3.select(this)
+        .html("Genre: " +  xScale(+d.data.rating)) // Update the tooltip content with the key
+        .style("left", (d3.pointer(this)[0] + 70) + "px")
+        .style("top", (d3.pointer(this)[1]) + "px");
+  }
+
+  var mouseleave = function(d) {
+    Tooltip
+      .style("opacity", 0)
+    d3.select(this)
+      .style("stroke", "none")
+      .style("opacity", 0.8)
+  }
+
+
+
   var bars = svg.append("g")
     .selectAll("g")
     .data(stackedData)
@@ -64,6 +102,10 @@ d3.csv('data/q2_data.csv').then(function(data) {
     .attr("height", d => yScale(+d[0]) - yScale(+d[1]))
     .attr("width", d => xScale.bandwidth())
     .attr("stroke", "white")
+    //Our new hover effects
+    .on("mouseover", mouseover)
+    .on("mousemove", mousemove)
+    .on("mouseleave", mouseleave)
 
       // Add x-axis
   svg.append("g")
@@ -91,8 +133,7 @@ d3.csv('data/q2_data.csv').then(function(data) {
     .style("text-anchor", "middle")
     .text("Total Revenue");
 
-
-  // Click event for 'female' button
+// Click event for 'female' button
   d3.select('#female').on("click", function () {
     var fem = data.filter(function (d) {
       return d.gender === " Female";
@@ -122,6 +163,15 @@ d3.csv('data/q2_data.csv').then(function(data) {
       .attr("height", d => yScale(+d[0]) - yScale(+d[1]))
       .attr("width", d => xScale.bandwidth())
       .attr("stroke", "white")
+      //Our new hover effects
+      .on('mouseover', function (d, i) {
+        d3.select(this).transition()
+              .duration('50')
+              .attr('opacity', '.85')})
+      .on('mouseout', function (d, i) {
+          d3.select(this).transition()
+                .duration('50')
+                .attr('opacity', '1')})
 
       // Add x-axis
       svg.append("g")
@@ -149,8 +199,6 @@ d3.csv('data/q2_data.csv').then(function(data) {
         .style("text-anchor", "middle")
         .text("Total Revenue");
   })
-
-
 
 
   // Time to add in the male data
@@ -182,6 +230,15 @@ d3.csv('data/q2_data.csv').then(function(data) {
       .attr("height", d => yScale(+d[0]) - yScale(+d[1]))
       .attr("width", d => xScale.bandwidth())
       .attr("stroke", "white")
+      //Our new hover effects
+      .on('mouseover', function (d, i) {
+        d3.select(this).transition()
+              .duration('50')
+              .attr('opacity', '.85')})
+      .on('mouseout', function (d, i) {
+          d3.select(this).transition()
+                .duration('50')
+                .attr('opacity', '1')})
 
       // Add x-axis
       svg.append("g")
@@ -238,6 +295,15 @@ d3.csv('data/q2_data.csv').then(function(data) {
       .attr("height", d => yScale(+d[0]) - yScale(+d[1]))
       .attr("width", d => xScale.bandwidth())
       .attr("stroke", "white")
+            //Our new hover effects
+      .on('mouseover', function (d, i) {
+        d3.select(this).transition()
+              .duration('50')
+              .attr('opacity', '.85')})
+      .on('mouseout', function (d, i) {
+          d3.select(this).transition()
+                .duration('50')
+                .attr('opacity', '1')})
 
       // Add x-axis
       svg.append("g")
@@ -268,26 +334,26 @@ d3.csv('data/q2_data.csv').then(function(data) {
   })
 
 
-    //Legend Stuff 
-  var legend = svg.append("g")
-    .attr("transform", "translate(" + (dimensions.width - dimensions.margin.right - 100) + "," + dimensions.margin.top + ")")
-    .selectAll(".legend")
-    .data(keys.reverse()) // Reverse the order to match the color scale
-    .enter().append("g")
-    .attr("class", "legend")
-    .attr("transform", function (d, i) { return "translate(0," + i * 20 + ")"; });
+  //   //Legend Stuff 
+  // var legend = svg.append("g")
+  //   .attr("transform", "translate(" + (dimensions.width - dimensions.margin.right - 100) + "," + dimensions.margin.top + ")")
+  //   .selectAll(".legend")
+  //   .data(keys.reverse()) // Reverse the order to match the color scale
+  //   .enter().append("g")
+  //   .attr("class", "legend")
+  //   .attr("transform", function (d, i) { return "translate(0," + i * 20 + ")"; });
 
-  legend.append("rect")
-    .attr("x", 0)
-    .attr("width", 9)
-    .attr("height", 9)
-    .style("fill", colorScale);
+  // legend.append("rect")
+  //   .attr("x", 0)
+  //   .attr("width", 9)
+  //   .attr("height", 9)
+  //   .style("fill", colorScale);
 
-  legend.append("text")
-    .attr("x", 25)
-    .attr("y", 9)
-    .attr("dy", ".35em")
-    .style("text-anchor", "start")
-    .text(function (d) { return d; });
+  // legend.append("text")
+  //   .attr("x", 25)
+  //   .attr("y", 9)
+  //   .attr("dy", ".35em")
+  //   .style("text-anchor", "start")
+  //   .text(function (d) { return d; });
 
   });
