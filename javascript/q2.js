@@ -41,16 +41,19 @@ d3.csv('data/q2_data.csv').then(function(data) {
     .domain([0, maximum])
     .range([dimensions.height - dimensions.margin.bottom, dimensions.margin.top]);
 
-  var colorScale = d3.scaleOrdinal()
-    .domain(keys)
-    .range(d3.schemeCategory10)
+  const colors = ["red", "blue", "green", "orange", "purple", 
+							"maroon", "brown", "steelblue", "pink", "black", 
+							"gray", "aquamarine", "coral", "darkgoldenrod", "darkseagreen",
+							"greenyellow", "olive", "indigo", "lavender", "mediumslateblue"]
+
+		//budget is X
 
   var stackedData = d3.stack()
     .keys(keys)
     (data)
 
   var Tooltip = d3.select("#barchart")
-    .append("div")
+    .append("svg")
     .style("opacity", 0)
     .attr("class", "tooltip")
     .style("background-color", "white")
@@ -66,14 +69,6 @@ d3.csv('data/q2_data.csv').then(function(data) {
     d3.select(this)
       .style("stroke", "black")
       .style("opacity", 1)
-  }
-  var mousemove = function(d, i) {
-    var key = keys[i]; // Get the key for the current bar
-    Tooltip
-    d3.select(this)
-        .html("Genre: " +  xScale(+d.data.rating)) // Update the tooltip content with the key
-        .style("left", (d3.pointer(this)[0] + 70) + "px")
-        .style("top", (d3.pointer(this)[1]) + "px");
   }
 
   var mouseleave = function(d) {
@@ -91,7 +86,7 @@ d3.csv('data/q2_data.csv').then(function(data) {
     .data(stackedData)
     .enter()
     .append("g")
-    .attr("fill", d => colorScale(d.key))
+    .attr("fill", function(d, i){return colors[i]})
     .selectAll("rect")
     .data(function (d) {return d;})
     .enter()
@@ -103,7 +98,6 @@ d3.csv('data/q2_data.csv').then(function(data) {
     .attr("stroke", "white")
       //Our new hover effects
     .on("mouseover", mouseover)
-    .on("mousemove", mousemove)
     .on("mouseleave", mouseleave)
 
       // Add x-axis
@@ -152,7 +146,7 @@ d3.csv('data/q2_data.csv').then(function(data) {
       .data(stackedFemaleData)
       .enter()
       .append("g")
-      .attr("fill", d => colorScale(d.key))
+      .attr("fill", function(d, i){return colors[i]})
       .selectAll("rect")
       .data(function (d) {return d;})
       .enter()
@@ -219,7 +213,7 @@ d3.csv('data/q2_data.csv').then(function(data) {
       .data(stackedMaleData)
       .enter()
       .append("g")
-      .attr("fill", d => colorScale(d.key))
+      .attr("fill", function(d, i){return colors[i]})
       .selectAll("rect")
       .data(function (d) {return d;})
       .enter()
@@ -284,7 +278,7 @@ d3.csv('data/q2_data.csv').then(function(data) {
       .data(stackedData)
       .enter()
       .append("g")
-      .attr("fill", d => colorScale(d.key))
+      .attr("fill", function(d, i){return colors[i]})
       .selectAll("rect")
       .data(function (d) {return d;})
       .enter()
@@ -333,26 +327,4 @@ d3.csv('data/q2_data.csv').then(function(data) {
   })
 
 
-  //   //Legend Stuff 
-  // var legend = svg.append("g")
-  //   .attr("transform", "translate(" + (dimensions.width - dimensions.margin.right - 100) + "," + dimensions.margin.top + ")")
-  //   .selectAll(".legend")
-  //   .data(keys.reverse()) // Reverse the order to match the color scale
-  //   .enter().append("g")
-  //   .attr("class", "legend")
-  //   .attr("transform", function (d, i) { return "translate(0," + i * 20 + ")"; });
-
-  // legend.append("rect")
-  //   .attr("x", 0)
-  //   .attr("width", 9)
-  //   .attr("height", 9)
-  //   .style("fill", colorScale);
-
-  // legend.append("text")
-  //   .attr("x", 25)
-  //   .attr("y", 9)
-  //   .attr("dy", ".35em")
-  //   .style("text-anchor", "start")
-  //   .text(function (d) { return d; });
-
-  });
+});
