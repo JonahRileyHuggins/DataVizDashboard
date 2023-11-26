@@ -8,12 +8,18 @@ d3.csv("/DataVizDashboard/data/movies_metadata.csv").then(
     function(dataset){
         
         //Sort data by year
-        const sort_data = dataset.sort(function(x,y){
+        var sort_data = dataset.sort(function(x,y){
             return d3.ascending(x.release_year, y.release_year)
         });
+        
 
-        //Aggregate data by year
-        const rev_data = d3.rollup(sort_data, (v) => d3.sum(v, (d) => +d.revenue), (d) => d.release_year);
+        //Aggregate data by year and filter to date range
+        const filterYearMin = 1930;
+        const filterYearMax = 2020;
+        sort_data = sort_data.filter((d) => {return (d.release_year >= filterYearMin && d.release_year <= filterYearMax)})
+        //const rev_data = d3.rollup(sort_data, (v) => d3.sum(v, (d) => +d.revenue), (d) => d.release_year);
+        const rev_data = d3.rollups(sort_data, (v) => d3.sum(v, (d) => +d.revenue), (d) => d.release_year)
+                            .map((d) => {return {"release_year":+d[0], "revenue":+d[1]}});
 
         const dimensions = {
             width: 800,
@@ -30,24 +36,22 @@ d3.csv("/DataVizDashboard/data/movies_metadata.csv").then(
         const svg = d3.select('#q1canvas')
                       .style('width', dimensions.width)
                       .style('height', dimensions.height);
-
-        //Define axis scales
-        const xScale = d3.scaleTime()
-                         .domain(d3.extent(dataset, function(d) { return new Date(d.release_date); }))
-                         .range([ dimensions.margin.left, dimensions.width - dimensions.margin.right])
-     
-         const yScale = d3.scaleLinear()
-                          .domain([0, d3.max(rev_data, function(d) { return +d[1]; })])
-                          .nice()
-                          .range([ dimensions.height-dimensions.margin.bottom,  dimensions.margin.top]);
      
         //Create axes
         const tickSize = 10;
-        const minYear = d3.min(rev_data, function(d) { return +d[0] })
-        const tickMin = minYear + tickSize - minYear%tickSize;
-        const maxYear = d3.max(rev_data, function(d) { return +d[0] })
+        const minYear = d3.min(rev_data, function(d) { return +d.release_year })
+        const tickMin = minYear - minYear%tickSize;
+        const maxYear = d3.max(rev_data, function(d) { return +d.release_year })
         const tickMax = maxYear - maxYear%tickSize;
         const tickVals = Array.from({length: (tickMax - tickMin)/ tickSize + 1}, (value, index) => new Date(tickMin + index*tickSize, 0 , 1));
+        const xScale = d3.scaleTime()
+                         .domain([new Date(`${tickMin}` + '-01-01'), new Date(`${tickMax}` + '-12-31')])
+                         .range([ dimensions.margin.left, dimensions.width - dimensions.margin.right]);
+        const yScale = d3.scaleLinear()
+                          .domain([0, d3.max(rev_data, function(d) { return +d.revenue; })])
+                          .nice()
+                          .range([ dimensions.height-dimensions.margin.bottom,  dimensions.margin.top]);
+
         const xAxis = d3.axisBottom(xScale).tickValues(tickVals);
         const xAxisGroup = svg.append("g")
                               .call(xAxis)
@@ -67,8 +71,8 @@ d3.csv("/DataVizDashboard/data/movies_metadata.csv").then(
                         .attr("stroke", "blue")
                         .attr("stroke-width", 1.5)
                         .attr("d", d3.line()
-                                     .x(function(d) { return xScale(new Date(d[0])) })
-                                     .y(function(d) { return yScale(d[1]) })
+                                     .x(function(d) { return xScale(new Date(`${d.release_year}`+'-12-31')) })
+                                     .y(function(d) { return yScale(d.revenue) })
                              );
         
               // Add X-axis label
