@@ -62,7 +62,6 @@ d3.csv("data/movies_metadata.csv").then(
                          .range([ dimensions.margin.left, dimensions.width - dimensions.margin.right]);
         const yScale = d3.scaleLinear()
                           .domain([0, d3.max(rev_data, function(d) { return +d.revenue; })])
-                          //.domain([0, 3000000000])
                           .nice()
                           .range([ dimensions.height-dimensions.margin.bottom,  dimensions.margin.top]);
 
@@ -97,14 +96,18 @@ d3.csv("data/movies_metadata.csv").then(
                                 .attr("opacity", 0.5);
                             text.text(i[0]);
                           })
-                        .on("mouseout", function(){
+                         .on("mouseout", function(){
                             d3.select(this)
                                 .attr("opacity", 1.0);
                             text.text("");
                           })
+                         .on("click", (d,i) => {
+                            d3.select("#q1canvas")
+                              .dispatch("genre_change", {detail: {genre: i[0]}});
+                         })
                          .attr("fill", "none")
                          .attr("stroke", (d, i) => {return colors[i]})
-                         .attr("stroke-width", 2.0)
+                         .attr("stroke-width", 3.0)
                          .attr("d", (d) => {return d3.line()
                                                      .x(function(d) { return xScale(new Date(`${d.release_year}`+'-12-31')) })
                                                      .y(function(d) { return yScale(d.revenue) })
@@ -129,5 +132,20 @@ d3.csv("data/movies_metadata.csv").then(
            .attr("font-size", "14px")
            .attr("fill", "black")
            .attr("transform", "rotate(-90)"); // Rotate the text for vertical orientation
+    
+        //Interaction listener
+        svg.on("genre_change", (g) => {
+            line.filter((d) => {return d[0] !== g.detail.genre})
+                .transition().duration(100)
+                .attr("stroke-width", 0.0)
+            
+            line.filter((d) => {return d[0] === g.detail.genre})
+                .transition().duration(100)
+                .attr("stroke-width", 3.0)
+            
+            yScale.domain([0, d3.max(rev_data.filter((d)=>{return d.genre === g.detail.genre}), function(d) { return +d.revenue; })]);
+
+            yAxisGroup.transition(100).call(yAxis);
+        })
     }
 )
