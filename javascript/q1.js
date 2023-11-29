@@ -4,9 +4,21 @@
     Answer the following question: How has the gross revenue of the film industry changed over time with regards to genre, actor, or director?
 */
 
-d3.csv("/DataVizDashboard/data/movies_metadata.csv").then(
+d3.csv("data/movies_metadata.csv").then(
     function(dataset){
         
+        var genres = ["Action","Adventure","Animation","Comedy","Crime",
+                      "Documentary","Drama","Family","Fantasy","Foreign",
+                      "History","Horror","Music","Mystery","Romance",
+                      "Science Fiction","TV Movie","Thriller","War","Western"];
+
+        const colors = ["red", "blue", "green", "orange", "purple", 
+							"maroon", "brown", "steelblue", "pink", "black", 
+							"gray", "aquamarine", "coral", "darkgoldenrod", "darkseagreen",
+							"greenyellow", "olive", "indigo", "lavender", "mediumslateblue"]
+
+        var genre_selected = "";
+
         //Sort data by year
         var sort_data = dataset.sort(function(x,y){
             return d3.ascending(x.release_year, y.release_year)
@@ -17,10 +29,11 @@ d3.csv("/DataVizDashboard/data/movies_metadata.csv").then(
         const filterYearMin = 1930;
         const filterYearMax = 2020;
         sort_data = sort_data.filter((d) => {return (d.release_year >= filterYearMin && d.release_year <= filterYearMax)})
-        //const rev_data = d3.rollup(sort_data, (v) => d3.sum(v, (d) => +d.revenue), (d) => d.release_year);
-        const rev_data = d3.rollups(sort_data, (v) => d3.sum(v, (d) => +d.revenue), (d) => d.release_year)
-                            .map((d) => {return {"release_year":+d[0], "revenue":+d[1]}});
+        const rev_data = d3.rollups(sort_data, (v) => d3.sum(v, (d) => +d.revenue), (d) => d.release_year, (d) => d.genres.split(",")[0])
+                           .flatMap((d) => {return d[1].map((a) => {return {"release_year":+d[0], "genre":a[0], "revenue":+a[1]}})});
 
+        var genre_rev = d3.group(rev_data, (d) => {return d.genre});
+        
         const dimensions = {
             width: 800,
             height: 400,
@@ -49,6 +62,7 @@ d3.csv("/DataVizDashboard/data/movies_metadata.csv").then(
                          .range([ dimensions.margin.left, dimensions.width - dimensions.margin.right]);
         const yScale = d3.scaleLinear()
                           .domain([0, d3.max(rev_data, function(d) { return +d.revenue; })])
+                          //.domain([0, 3000000000])
                           .nice()
                           .range([ dimensions.height-dimensions.margin.bottom,  dimensions.margin.top]);
 
@@ -63,18 +77,40 @@ d3.csv("/DataVizDashboard/data/movies_metadata.csv").then(
                               .call(yAxis)
                               .style("transform", `translateX(${dimensions.margin.left}px`)
                               .attr("color", "black");
-                     
-         // Add the line
-        const line = svg.append("path")
-                        .datum(rev_data)
-                        .attr("fill", "none")
-                        .attr("stroke", "blue")
-                        .attr("stroke-width", 1.5)
-                        .attr("d", d3.line()
-                                     .x(function(d) { return xScale(new Date(`${d.release_year}`+'-12-31')) })
-                                     .y(function(d) { return yScale(d.revenue) })
-                             );
-        
+            
+        //Add text
+        var text = svg
+                .append('text')
+                .attr("id", 'topbartext')
+                .attr("x", dimensions.width*0.75)
+                .attr("y", dimensions.height*0.1)
+                .attr("dx", "-.8em")
+                .attr("dy", ".15em")
+                .attr("font-family", "sans-serif")
+                .text("");
+
+        var line = svg.selectAll(".line")
+                         .data(genre_rev)
+                         .join("path")
+                         .on("mouseover", function(d, i){
+                            d3.select(this)
+                                .attr("opacity", 0.5);
+                            text.text(i[0]);
+                          })
+                        .on("mouseout", function(){
+                            d3.select(this)
+                                .attr("opacity", 1.0);
+                            text.text("");
+                          })
+                         .attr("fill", "none")
+                         .attr("stroke", (d, i) => {return colors[i]})
+                         .attr("stroke-width", 2.0)
+                         .attr("d", (d) => {return d3.line()
+                                                     .x(function(d) { return xScale(new Date(`${d.release_year}`+'-12-31')) })
+                                                     .y(function(d) { return yScale(d.revenue) })
+                                                     (d[1])
+                                           });
+                        
               // Add X-axis label
         svg.append("text")
             .text("Release Year")
