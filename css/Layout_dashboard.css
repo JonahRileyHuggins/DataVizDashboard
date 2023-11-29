@@ -39,4 +39,10 @@
       left: 50%;
   }
   
+  #buttonContainer {
+    position: relative;
+  }
   
+  button {
+    margin-top: 10px; /* Adjust this value based on your preference */
+  }
