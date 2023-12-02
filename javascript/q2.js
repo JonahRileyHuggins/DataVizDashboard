@@ -46,39 +46,9 @@ d3.csv('data/q2_data.csv').then(function(data) {
 							"gray", "aquamarine", "coral", "darkgoldenrod", "darkseagreen",
 							"greenyellow", "olive", "indigo", "lavender", "mediumslateblue"]
 
-		//budget is X
-
   var stackedData = d3.stack()
     .keys(keys)
     (data)
-
-  var Tooltip = d3.select("#barchart")
-    .append("svg")
-    .style("opacity", 0)
-    .attr("class", "tooltip")
-    .style("background-color", "white")
-    .style("border", "solid")
-    .style("border-width", "2px")
-    .style("border-radius", "5px")
-    .style("padding", "5px")
-
-  // Three function that change the tooltip when user hover / move / leave a cell
-  var mouseover = function(d) {
-    Tooltip
-      .style("opacity", 1)
-    d3.select(this)
-      .style("stroke", "black")
-      .style("opacity", 1)
-  }
-
-  var mouseleave = function(d) {
-    Tooltip
-      .style("opacity", 0)
-    d3.select(this)
-      .style("stroke", "none")
-      .style("opacity", 0.8)
-  }
-
 
 
   var bars = svg.append("g")
@@ -97,8 +67,15 @@ d3.csv('data/q2_data.csv').then(function(data) {
     .attr("width", d => xScale.bandwidth())
     .attr("stroke", "white")
       //Our new hover effects
-    .on("mouseover", mouseover)
-    .on("mouseleave", mouseleave)
+      //Our new hover effects
+    .on('mouseover', function (d, i) {
+      d3.select(this).transition()
+            .duration('50')
+            .attr('opacity', '.85')})
+    .on('mouseout', function (d, i) {
+        d3.select(this).transition()
+              .duration('50')
+              .attr('opacity', '1')})
 
       // Add x-axis
   svg.append("g")
@@ -173,7 +150,7 @@ d3.csv('data/q2_data.csv').then(function(data) {
   
       // Add y-axis
       svg.append("g")
-        .attr("transform", "translate(" + dimensions.margin.left + ",0)")
+        .attr("transform", "translate(" + dimensions.margin.left + ",100)")
         .call(d3.axisLeft(yScale));
     
       // Add x-axis label
