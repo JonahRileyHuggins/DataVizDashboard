@@ -6,12 +6,10 @@
   font-color: initial;
   position: absolute;
   top: 2%;
-  /* left: 25%; */
-  /* transform: translate(-50%, -50%); */
   z-index: 2;
   padding: 55px;
   height: 90%;
-  width: 80%;
+  width: 100%;
   text-align: left;
   font-size: 120%;
 }
@@ -98,6 +96,11 @@ button#western { background-color: mediumslateblue; }
     font-size: 24px;
     border: none;
     background: none;
-    top: 10%;
-    left: 100%;
+    position: absolute;
+    top: 12%;
+    left: 50%;
+    z-index: 2;
+    padding: 55px;
+    height: 90%;
+    width: 50%;
 }
