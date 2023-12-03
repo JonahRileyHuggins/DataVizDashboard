@@ -10,10 +10,10 @@ d3.csv('data/q2_data.csv').then(function(data) {
     width: 800,
     height: 400,
     margin: {
-      top: 50,
-      right: 50,
+      top: 10,
+      right: 0,
       bottom: 50,
-      left: 50,
+      left: 110,
       }
     }
 
@@ -79,7 +79,7 @@ d3.csv('data/q2_data.csv').then(function(data) {
 
       // Add x-axis
   svg.append("g")
-    .attr("transform", "translate(0," + (dimensions.height - dimensions.margin.bottom) + ")")
+    .attr("transform", "translate(20," + (dimensions.height - dimensions.margin.bottom) + ")")
     .call(d3.axisBottom(xScale));
 
   // Add y-axis
@@ -97,11 +97,12 @@ d3.csv('data/q2_data.csv').then(function(data) {
   // Add y-axis label
   svg.append("text")
     .attr("transform", "rotate(-90)")
-    .attr("y", 0 - dimensions.margin.left)
-    .attr("x", 0 - (dimensions.height / 2 + 10 ))
+    // .attr("y", 0 - dimensions.margin.left)
+    .attr("y", 50 - (dimensions.margin.left /2))
+    .attr("x", 0 - (dimensions.height / 2))
     .attr("dy", "1em")
     .style("text-anchor", "middle")
-    .text("Total Revenue");
+    .text("Average Revenue");
 
 // Click event for 'female' button
   d3.select('#female').on("click", function () {
@@ -164,7 +165,7 @@ d3.csv('data/q2_data.csv').then(function(data) {
       svg.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 0 - dimensions.margin.left)
-        .attr("x", 0 - (dimensions.height / 2 + 10 ))
+        .attr("x", 10 - (dimensions.height / 2 ))
         .attr("dy", "1em")
         .style("text-anchor", "middle")
         .text("Total Revenue");
@@ -231,7 +232,7 @@ d3.csv('data/q2_data.csv').then(function(data) {
       svg.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 0 - dimensions.margin.left)
-        .attr("x", 0 - (dimensions.height / 2 + 10 ))
+        .attr("x", 0 - (dimensions.height / 2 ))
         .attr("dy", "1em")
         .style("text-anchor", "middle")
         .text("Total Revenue");
@@ -296,7 +297,7 @@ d3.csv('data/q2_data.csv').then(function(data) {
       svg.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 0 - dimensions.margin.left)
-        .attr("x", 0 - (dimensions.height / 2 + 10 ))
+        .attr("x", 0 - (dimensions.height / 2 ))
         .attr("dy", "1em")
         .style("text-anchor", "middle")
         .text("Total Revenue");

@@ -5,12 +5,12 @@
   font-family: Arial, Helvetica, sans-serif;
   font-color: initial;
   position: absolute;
-  /* top: 55%; */
+  top: 2%;
   /* left: 25%; */
   /* transform: translate(-50%, -50%); */
   z-index: 2;
   padding: 55px;
-  height: 80%;
+  height: 90%;
   width: 80%;
   text-align: left;
   font-size: 120%;
@@ -91,4 +91,13 @@ button#western { background-color: mediumslateblue; }
     background: none;
     top: 50%;
     left: 50%;
+}
+
+.question3 {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 24px;
+    border: none;
+    background: none;
+    top: 10%;
+    left: 100%;
 }
