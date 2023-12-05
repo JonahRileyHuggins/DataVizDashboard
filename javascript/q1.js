@@ -102,7 +102,7 @@ d3.csv("data/movies_metadata.csv").then(
                             text.text("");
                           })
                          .on("click", (d,i) => {
-                            d3.select("#q1canvas")
+                            d3.selectAll("#q1canvas")
                               .dispatch("genre_change", {detail: {genre: i[0]}});
                          })
                          .attr("fill", "none")
