@@ -17,13 +17,17 @@ d3.csv("data/movies_metadata.csv").then(
 							"gray", "aquamarine", "coral", "darkgoldenrod", "darkseagreen",
 							"greenyellow", "olive", "indigo", "lavender", "mediumslateblue"]
 
+        var genreColor = {}
+        for(var i = 0; i < genres.length; i++){
+            genreColor[genres[i]] = colors[i];
+        }
+
         var genre_selected = "";
 
         //Sort data by year
         var sort_data = dataset.sort(function(x,y){
             return d3.ascending(x.release_year, y.release_year)
         });
-        
 
         //Aggregate data by year and filter to date range
         const filterYearMin = 1930;
@@ -109,7 +113,7 @@ d3.csv("data/movies_metadata.csv").then(
                               .dispatch("genre_change", {detail: {genre: i[0]}});
                          })
                          .attr("fill", "none")
-                         .attr("stroke", (d, i) => {return colors[i]})
+                         .attr("stroke", (d, i) => {return genreColor[d[0]]})
                          .attr("stroke-width", 3.0)
                          .attr("d", (d) => {return d3.line()
                                                      .x(function(d) { return xScale(new Date(`${d.release_year}`+'-12-31')) })
@@ -154,8 +158,39 @@ d3.csv("data/movies_metadata.csv").then(
                     .y(function(d) { return yScale(d.revenue) })
                     (d[1])
                 });
-            
+        });
 
-        })
+        d3.selectAll(".legend-button").on("click", (b) => {
+            yScale.domain([0, d3.max(rev_data.filter((d)=>{return d.genre === b.target.textContent}), function(d) { return +d.revenue; })]);
+
+            yAxisGroup.transition(100).call(yAxis);
+
+            line.filter((d) => {return d[0] !== b.target.textContent})
+                .transition().duration(100)
+                .attr("stroke-width", 0.0)
+            
+            line.filter((d) => {return d[0] === b.target.textContent})
+                .transition().duration(100)
+                .attr("stroke-width", 3.0)
+                .attr("d", (d) => {return d3.line()
+                    .x(function(d) { return xScale(new Date(`${d.release_year}`+'-12-31')) })
+                    .y(function(d) { return yScale(d.revenue) })
+                    (d[1])
+                });
+        });
+
+        d3.select("#clear").on("click", (b) => {
+            yScale.domain([0, d3.max(rev_data, function(d) { return +d.revenue; })])
+
+            yAxisGroup.transition(100).call(yAxis);
+            
+            line.transition().duration(100)
+                .attr("stroke-width", 3.0)
+                .attr("d", (d) => {return d3.line()
+                    .x(function(d) { return xScale(new Date(`${d.release_year}`+'-12-31')) })
+                    .y(function(d) { return yScale(d.revenue) })
+                    (d[1])
+                });
+        });
     }
 )
