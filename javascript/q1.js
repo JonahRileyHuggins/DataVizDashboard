@@ -28,8 +28,11 @@ d3.csv("data/movies_metadata.csv").then(
         //Aggregate data by year and filter to date range
         const filterYearMin = 1930;
         const filterYearMax = 2020;
-        sort_data = sort_data.filter((d) => {return (d.release_year >= filterYearMin && d.release_year <= filterYearMax)})
-        const rev_data = d3.rollups(sort_data, (v) => d3.sum(v, (d) => +d.revenue), (d) => d.release_year, (d) => d.genres.split(",")[0])
+        sort_data = sort_data.filter((d) => {return (d.release_year >= filterYearMin && d.release_year <= filterYearMax)});
+        //const rev_data = d3.rollups(sort_data, (v) => d3.sum(v, (d) => +d.revenue), (d) => d.release_year, (d) => d.genres.split(",")[0])
+        //                   .flatMap((d) => {return d[1].map((a) => {return {"release_year":+d[0], "genre":a[0], "revenue":+a[1]}})});
+        
+        const rev_data = d3.rollups(sort_data, (v) => d3.count(v, (d) => d.release_year), (d) => d.release_year, (d) => d.genres.split(",")[0])
                            .flatMap((d) => {return d[1].map((a) => {return {"release_year":+d[0], "genre":a[0], "revenue":+a[1]}})});
 
         var genre_rev = d3.group(rev_data, (d) => {return d.genre});
@@ -114,27 +117,31 @@ d3.csv("data/movies_metadata.csv").then(
                                                      (d[1])
                                            });
                         
-              // Add X-axis label
+        // Add X-axis label
         svg.append("text")
             .text("Release Year")
             .attr("x", dimensions.width / 2)
             .attr("y", dimensions.height - 10) // Adjust the Y position
             .attr("text-anchor", "middle")
-            .attr("font-size", "14px")
+            .attr("font-size", "24px")
             .attr("fill", "black");
 
         // Add Y-axis label
         svg.append("text")
-           .text("Total Revenue")
+           .text("Films Released")
            .attr("x", -dimensions.height / 2) // Rotate the text for vertical orientation
-           .attr("y", 15) // Adjust the Y position
+           .attr("y", 25) // Adjust the Y position
            .attr("text-anchor", "middle")
-           .attr("font-size", "14px")
+           .attr("font-size", "24px")
            .attr("fill", "black")
            .attr("transform", "rotate(-90)"); // Rotate the text for vertical orientation
     
         //Interaction listener
         svg.on("genre_change", (g) => {
+            yScale.domain([0, d3.max(rev_data.filter((d)=>{return d.genre === g.detail.genre}), function(d) { return +d.revenue; })]);
+
+            yAxisGroup.transition(100).call(yAxis);
+
             line.filter((d) => {return d[0] !== g.detail.genre})
                 .transition().duration(100)
                 .attr("stroke-width", 0.0)
@@ -142,10 +149,13 @@ d3.csv("data/movies_metadata.csv").then(
             line.filter((d) => {return d[0] === g.detail.genre})
                 .transition().duration(100)
                 .attr("stroke-width", 3.0)
+                .attr("d", (d) => {return d3.line()
+                    .x(function(d) { return xScale(new Date(`${d.release_year}`+'-12-31')) })
+                    .y(function(d) { return yScale(d.revenue) })
+                    (d[1])
+                });
             
-            yScale.domain([0, d3.max(rev_data.filter((d)=>{return d.genre === g.detail.genre}), function(d) { return +d.revenue; })]);
 
-            yAxisGroup.transition(100).call(yAxis);
         })
     }
 )
