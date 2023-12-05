@@ -10,10 +10,10 @@ d3.csv('data/q2_data.csv').then(function(data) {
     width: 800,
     height: 400,
     margin: {
-      top: 50,
-      right: 50,
+      top: 10,
+      right: 0,
       bottom: 50,
-      left: 50,
+      left: 110,
       }
     }
 
@@ -46,39 +46,9 @@ d3.csv('data/q2_data.csv').then(function(data) {
 							"gray", "aquamarine", "coral", "darkgoldenrod", "darkseagreen",
 							"greenyellow", "olive", "indigo", "lavender", "mediumslateblue"]
 
-		//budget is X
-
   var stackedData = d3.stack()
     .keys(keys)
     (data)
-
-  var Tooltip = d3.select("#barchart")
-    .append("svg")
-    .style("opacity", 0)
-    .attr("class", "tooltip")
-    .style("background-color", "white")
-    .style("border", "solid")
-    .style("border-width", "2px")
-    .style("border-radius", "5px")
-    .style("padding", "5px")
-
-  // Three function that change the tooltip when user hover / move / leave a cell
-  var mouseover = function(d) {
-    Tooltip
-      .style("opacity", 1)
-    d3.select(this)
-      .style("stroke", "black")
-      .style("opacity", 1)
-  }
-
-  var mouseleave = function(d) {
-    Tooltip
-      .style("opacity", 0)
-    d3.select(this)
-      .style("stroke", "none")
-      .style("opacity", 0.8)
-  }
-
 
 
   var bars = svg.append("g")
@@ -97,12 +67,19 @@ d3.csv('data/q2_data.csv').then(function(data) {
     .attr("width", d => xScale.bandwidth())
     .attr("stroke", "white")
       //Our new hover effects
-    .on("mouseover", mouseover)
-    .on("mouseleave", mouseleave)
+      //Our new hover effects
+    .on('mouseover', function (d, i) {
+      d3.select(this).transition()
+            .duration('50')
+            .attr('opacity', '.85')})
+    .on('mouseout', function (d, i) {
+        d3.select(this).transition()
+              .duration('50')
+              .attr('opacity', '1')})
 
       // Add x-axis
   svg.append("g")
-    .attr("transform", "translate(0," + (dimensions.height - dimensions.margin.bottom) + ")")
+    .attr("transform", "translate(20," + (dimensions.height - dimensions.margin.bottom) + ")")
     .call(d3.axisBottom(xScale));
 
   // Add y-axis
@@ -120,11 +97,12 @@ d3.csv('data/q2_data.csv').then(function(data) {
   // Add y-axis label
   svg.append("text")
     .attr("transform", "rotate(-90)")
-    .attr("y", 0 - dimensions.margin.left)
-    .attr("x", 0 - (dimensions.height / 2 + 10 ))
+    // .attr("y", 0 - dimensions.margin.left)
+    .attr("y", 50 - (dimensions.margin.left /2))
+    .attr("x", 0 - (dimensions.height / 2))
     .attr("dy", "1em")
     .style("text-anchor", "middle")
-    .text("Total Revenue");
+    .text("Average Revenue");
 
 // Click event for 'female' button
   d3.select('#female').on("click", function () {
@@ -173,7 +151,7 @@ d3.csv('data/q2_data.csv').then(function(data) {
   
       // Add y-axis
       svg.append("g")
-        .attr("transform", "translate(" + dimensions.margin.left + ",0)")
+        .attr("transform", "translate(" + dimensions.margin.left + ",100)")
         .call(d3.axisLeft(yScale));
     
       // Add x-axis label
@@ -187,7 +165,7 @@ d3.csv('data/q2_data.csv').then(function(data) {
       svg.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 0 - dimensions.margin.left)
-        .attr("x", 0 - (dimensions.height / 2 + 10 ))
+        .attr("x", 10 - (dimensions.height / 2 ))
         .attr("dy", "1em")
         .style("text-anchor", "middle")
         .text("Total Revenue");
@@ -254,7 +232,7 @@ d3.csv('data/q2_data.csv').then(function(data) {
       svg.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 0 - dimensions.margin.left)
-        .attr("x", 0 - (dimensions.height / 2 + 10 ))
+        .attr("x", 0 - (dimensions.height / 2 ))
         .attr("dy", "1em")
         .style("text-anchor", "middle")
         .text("Total Revenue");
@@ -319,7 +297,7 @@ d3.csv('data/q2_data.csv').then(function(data) {
       svg.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 0 - dimensions.margin.left)
-        .attr("x", 0 - (dimensions.height / 2 + 10 ))
+        .attr("x", 0 - (dimensions.height / 2 ))
         .attr("dy", "1em")
         .style("text-anchor", "middle")
         .text("Total Revenue");

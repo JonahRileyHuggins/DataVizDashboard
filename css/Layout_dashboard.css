@@ -1,48 +1,106 @@
-
 /* Position text in the middle of the page/image */
 .Information {
-    background-color: rgba(255,255,255 1.0)
-    font-weight: bold;
-    font-family: Arial, Helvetica, sans-serif;
-    font-color: initial;
-    position: absolute;
-    top: 70%;
-    left: 60%;
-    transform: translate(-50%, -50%);
-    z-index: 2;
-    padding: 55px;
-    height: 80%;
-    width: 80%;
-    text-align: left;
-    font-size: 120%;
-  }
+  background-color: rgba(255,255,255 1.0)
+  font-weight: bold;
+  font-family: Arial, Helvetica, sans-serif;
+  font-color: initial;
+  position: absolute;
+  top: 2%;
+  z-index: 2;
+  padding: 55px;
+  height: 90%;
+  width: 100%;
+  text-align: left;
+  font-size: 120%;
+}
 
-  /* CSS for individual question elements */
-  .question1 {
+#buttonContainer {
+  position: relative;
+}
+
+button {
+  margin-top: 10px; 
+}
+
+/* Apply color-coding to buttons */
+button#combined { background-color: red; }
+button#female { background-color: blue; }
+button#male { background-color: green; }
+
+/* Add color-coding for each genre button */
+button#action { background-color: red; }
+button#adventure { background-color: blue; }
+button#animation { background-color: green; }
+button#comedy { background-color: orange; }
+button#crime { background-color: purple; }
+button#documentary { background-color: maroon; }
+button#drama { background-color: brown; }
+button#family { background-color: steelblue; }
+button#fantasy { background-color: pink; }
+button#foreign { background-color: black; color: white;}
+button#history { background-color: gray; }
+button#horror { background-color: aquamarine; }
+button#music { background-color: coral; }
+button#mystery { background-color: darkgoldenrod; }
+button#romance { background-color: darkseagreen; }
+button#science-fiction { background-color: greenyellow; }
+button#tv-movie { background-color: olive; }
+button#thriller { background-color: indigo; }
+button#war { background-color: lavender; }
+button#western { background-color: mediumslateblue; }
+
+.color-box {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  border: 1px solid #ccc;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-right: 40px;
+  margin-bottom: 10px;
+}
+
+
+/* CSS for individual question elements */
+.question1 {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 24px;
+  border: none;
+  background: none;
+  top: 10%;
+  left: 50%;
+}
+
+
+
+/* CSS for individual question elements */
+.question2 {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 24px;
     border: none;
     background: none;
-    top: 20%;
+    top: 50%;
     left: 50%;
 }
-  
 
-
-  /* CSS for individual question elements */
-  .question2 {
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: 24px;
-      border: none;
-      background: none;
-      top: 50%;
-      left: 50%;
-  }
-  
-  #buttonContainer {
-    position: relative;
-  }
-  
-  button {
-    margin-top: 10px; /* Adjust this value based on your preference */
-  }
+.question3 {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 24px;
+    border: none;
+    background: none;
+    position: absolute;
+    top: 12%;
+    left: 50%;
+    z-index: 2;
+    padding: 55px;
+    height: 90%;
+    width: 50%;
+}
