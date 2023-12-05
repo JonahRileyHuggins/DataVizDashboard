@@ -109,6 +109,66 @@ d3.csv('data/q2_data.csv').then(function(data) {
     .style("text-anchor", "middle")
     .text("Average Revenue");
 
+// Here, I want to add in the functionality for the buttons. 
+  d3.select(".legend-button").on("click", function(){
+    var genres = d3.select(this).attr("id").toLowerCase();
+    var genreColumn = data.columns.find(column => column.toLowerCase() === genres);
+    var genreColor = colors[genres.indexOf(genres)]
+    // removing the previous bars
+    svg.selectAll("g")
+       .remove()
+    
+    var genreData = data.map(d => ({
+      gender: d.gender,
+      rating: d.rating,
+      [genres]: d[genreColumn]
+    }));
+    console.log(genreData.d[genreColumn])
+    var yScale = d3.scaleLinear()
+          .domain([0, d3.max(genreData, d => d[genres])])
+          .range([dimensions.height - dimensions.margin.bottom, dimensions.margin.top]);
+
+    var genreBar = svg.append("g")
+      .selectAll("rect")
+      .data(genreData)
+      .enter()
+      .append("rect")
+      .attr("x", d => xScale(+d.rating))
+      .attr("y", d => yScale(+d[genres]))
+      .attr("height", d => yScale(0) - yScale(+d[genres]))
+      .attr("width", d => xScale.bandwidth())
+      .attr("fill", genreColor)
+
+      
+    // Add x-axis
+    svg.append("g")
+      .attr("transform", "translate(20," + (dimensions.height - dimensions.margin.bottom) + ")")
+      .call(d3.axisBottom(xScale));
+
+    // Add y-axis
+    svg.append("g")
+      .attr("transform", "translate(" + dimensions.margin.left + ",0)")
+      .call(d3.axisLeft(yScale));
+
+    // Add x-axis label
+    svg.append("text")
+      .attr("transform", "translate(" + (dimensions.width / 2) + " ," +
+        (dimensions.height - dimensions.margin.bottom + 40) + ")")
+      .style("text-anchor", "middle")
+      .text("Rating");
+
+    // Add y-axis label
+    svg.append("text")
+      .attr("transform", "rotate(-90)")
+      // .attr("y", 0 - dimensions.margin.left)
+      .attr("y", 50 - (dimensions.margin.left /2))
+      .attr("x", 0 - (dimensions.height / 2))
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text("Average Revenue");
+
+  })
+
 // Click event for 'female' button
   d3.select('#female').on("click", function () {
     var fem = data.filter(function (d) {
@@ -132,8 +192,8 @@ d3.csv('data/q2_data.csv').then(function(data) {
     // removing the previous bars
     svg.selectAll("g")
       .remove()
-
-    // Update the existing bars
+ 
+    // Create new fem-data bars
     var bars = svg.append("g")
       .selectAll("g")
       .data(stackedFemaleData)
