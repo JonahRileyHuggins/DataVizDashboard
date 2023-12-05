@@ -41,6 +41,13 @@ d3.csv('data/q2_data.csv').then(function(data) {
     .domain([0, maximum])
     .range([dimensions.height - dimensions.margin.bottom, dimensions.margin.top]);
 
+
+  var genres = ["Action","Adventure","Animation","Comedy","Crime",
+              "Documentary","Drama","Family","Fantasy","Foreign",
+              "History","Horror","Music","Mystery","Romance",
+              "Science Fiction","TV Movie","Thriller","War","Western"];
+
+  
   const colors = ["red", "blue", "green", "orange", "purple", 
 							"maroon", "brown", "steelblue", "pink", "black", 
 							"gray", "aquamarine", "coral", "darkgoldenrod", "darkseagreen",
@@ -151,7 +158,7 @@ d3.csv('data/q2_data.csv').then(function(data) {
   
       // Add y-axis
       svg.append("g")
-        .attr("transform", "translate(" + dimensions.margin.left + ",100)")
+        .attr("transform", "translate(" + dimensions.margin.left + ",0)")
         .call(d3.axisLeft(yScale));
     
       // Add x-axis label
@@ -165,7 +172,7 @@ d3.csv('data/q2_data.csv').then(function(data) {
       svg.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 0 - dimensions.margin.left)
-        .attr("x", 10 - (dimensions.height / 2 ))
+        .attr("x", 0 - (dimensions.height / 2 ))
         .attr("dy", "1em")
         .style("text-anchor", "middle")
         .text("Total Revenue");
