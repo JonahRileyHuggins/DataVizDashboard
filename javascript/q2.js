@@ -42,7 +42,7 @@ d3.csv('data/q2_data.csv').then(function(data) {
     .range([dimensions.height - dimensions.margin.bottom, dimensions.margin.top]);
 
 
-  var genres = ["Action","Adventure","Animation","Comedy","Crime",
+  const genres = ["Action","Adventure","Animation","Comedy","Crime",
               "Documentary","Drama","Family","Fantasy","Foreign",
               "History","Horror","Music","Mystery","Romance",
               "Science Fiction","TV Movie","Thriller","War","Western"];
@@ -73,8 +73,6 @@ d3.csv('data/q2_data.csv').then(function(data) {
     .attr("height", d => yScale(+d[0]) - yScale(+d[1]))
     .attr("width", d => xScale.bandwidth())
     .attr("stroke", "white")
-      //Our new hover effects
-      //Our new hover effects
     .on('mouseover', function (d, i) {
       d3.select(this).transition()
             .duration('50')
@@ -120,6 +118,16 @@ d3.csv('data/q2_data.csv').then(function(data) {
     var stackedFemaleData = d3.stack()
       .keys(keys)
       (fem);
+    
+    var yScale = d3.scaleLinear()
+      .domain([0, d3.max(fem, function (d) {
+        var sumName = 0;
+        for (var i = 0; i < keys.length; i++) {
+          sumName = sumName + parseFloat(d[keys[i]]);
+        }
+        return sumName;
+      })])
+      .range([dimensions.height - dimensions.margin.bottom, dimensions.margin.top]);
     
     // removing the previous bars
     svg.selectAll("g")
@@ -188,6 +196,15 @@ d3.csv('data/q2_data.csv').then(function(data) {
       .keys(keys)
       (men)
 
+    var yScale = d3.scaleLinear()
+    .domain([0, d3.max(men, function (d) {
+      var sumName = 0;
+      for (var i = 0; i < keys.length; i++) {
+        sumName = sumName + parseFloat(d[keys[i]]);
+      }
+      return sumName;
+    })])
+      .range([dimensions.height - dimensions.margin.bottom, dimensions.margin.top]);
     // removing the previous bars
     svg.selectAll("g")
       .remove()
