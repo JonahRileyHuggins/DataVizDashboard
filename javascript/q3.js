@@ -1,4 +1,5 @@
-d3.csv("/DataVizDashboard/javascript/profit_by_genre.csv").then(function(dataset) 
+//d3.csv("javascript/profit_by_genre.csv").then(function(dataset) 
+d3.csv("data/q3_data.csv").then(function(dataset) 
 	{
 		const dimensions = {
 			width: 800,
@@ -11,55 +12,100 @@ d3.csv("/DataVizDashboard/javascript/profit_by_genre.csv").then(function(dataset
 			},
 		}
 
+		var datasetGenre = d3.group(dataset, (d) => {return d.primary_genre})
+
 		const svg = d3.select("#q3scatterplot")
 			.style("width", dimensions.width)
 			.style("height", dimensions.height)
 
+		const genres = ["Action", "Adventure", "Animation", "Comedy", "Crime",
+							"Documentary", "Drama", "Family", "Fantasy", "Foreign",
+							"History", "Horror", "Music", "Mystery", "Romance",
+							"Science Fiction", "TV Movie", "Thriller", "War", "Western"];
+
 		const colors = ["red", "blue", "green", "orange", "purple", 
 							"maroon", "brown", "steelblue", "pink", "black", 
 							"gray", "aquamarine", "coral", "darkgoldenrod", "darkseagreen",
-							"greenyellow", "olive", "indigo", "lavender", "mediumslateblue"]
+							"greenyellow", "olive", "indigo", "lavender", "mediumslateblue"]  
+
+		var genreColor = {};
+		for(var i = 0; i < genres.length; i++){
+			genreColor[genres[i]] = colors[i];
+		}
+                             
+		var datasetAvgRev = d3.rollup(dataset, v => d3.mean(v, d => d.revenue), d => d.primary_genre);
+		var datasetAvgBud = d3.rollup(dataset, v => d3.mean(v, d => d.budget), d => d.primary_genre);
+      var datasetAvg = [];        
+      for(var i = 0; i < genres.length; i++)
+			datasetAvg[i] = [genres[i], +datasetAvgBud.get(genres[i]), +datasetAvgRev.get(genres[i])];
+
+		var genre_selected = "";
 
 		//budget is X
  		var xScale = d3.scaleLinear()
-								.domain(d3.extent(dataset, d => +d.bud))
-								.range([dimensions.margin.left, dimensions.width-dimensions.margin.right])
+								.domain(d3.extent(datasetAvg, d => +d[1]))
+								.range([dimensions.margin.left, dimensions.width-dimensions.margin.right]);
  
  		//revenue is Y
   		var yScale = d3.scaleLinear()
-								.domain(d3.extent(dataset, d => +d.rev))
-								.range([dimensions.height - dimensions.margin.top, dimensions.margin.bottom])
-
-		console.log(d3.extent(dataset, d => +d.bud))
+								.domain(d3.extent(datasetAvg, d => +d[2]))
+								.range([dimensions.height - dimensions.margin.top, dimensions.margin.bottom]);
+       
+		var text = svg.append("text")
+								.attr("id", 'descriptionText')
+								.attr("x", dimensions.width*0.18)
+								.attr("y", dimensions.height*0.1)
+								.attr("dx", "-.8em")
+								.attr("dy", ".15em")
+								.attr("font-family", "sans-serif")
+								.text("");
 
 		var dots = svg.append("g")
 								.selectAll("circle")
-								.data(dataset)
+								.data(datasetAvg)
 								.enter()
 								.append("circle")
-								.attr("cx", d => xScale(d.bud))
-								.attr("cy", d => yScale(d.rev))
-								.attr("r", 5)
-								.attr("fill", function(d, i){return colors[i]})
+								.attr("cx", d => xScale(d[1]))
+								.attr("cy", d => yScale(d[2]))
+								.attr("r", 5)                   
+								.on("mouseover", function(d, i){
+									d3.select(this)
+										.attr("opacity", .8)
+										.attr("r", 8);
+									text.text(i[0]);
+								})
+								.on("mouseout", function(){
+									d3.select(this)
+										.attr("opacity", 1)
+										.attr("r", 5);
+									text.text("");
+								})
+								.on("click", (d, i) => {
+									d3.selectAll("#q1canvas")
+										.dispatch("genre_change", {detail: {genre: i[0]}});
+									d3.selectAll("#q3scatterplot")
+										.dispatch("genre_change", {detail: {genre: i[0]}});
+								})                           
+								.attr("fill", function(d, i){return genreColor[d[0]]});  
 
-		const xAxis = d3.axisBottom().scale(xScale)
+		var xAxis = d3.axisBottom().scale(xScale);
 		const xAxisGroup = svg.append("g")
 										.call(xAxis)
 										.style("transform", `translateY(${dimensions.height - dimensions.margin.bottom*0.8}px`)
-										.attr("color", "black")
+										.attr("color", "black");
 
-		const yAxis = d3.axisLeft().scale(yScale)
+		var yAxis = d3.axisLeft().scale(yScale);
 		const yAxisGroup = svg.append("g")
 										.call(yAxis)
 										.style("transform", `translateX(${dimensions.margin.left}px`)
-										.attr("color", "black")
+										.attr("color", "black");
 
 		svg.append("text")
 			.text("Budget")
 			.attr("x", dimensions.width / 2)
 			.attr("y", dimensions.height - 5)
 			.attr("text-anchor", "middle")
-			.attr("font-size", "14px")
+			.attr("font-size", "14px");
 
 		svg.append("text")
 			.text("Revenue")
@@ -67,31 +113,113 @@ d3.csv("/DataVizDashboard/javascript/profit_by_genre.csv").then(function(dataset
 			.attr("y", dimensions.margin.left / 3)
 			.attr("text-anchor", "middle")
 			.attr("font-size", "14px")
-			.attr("transform", "rotate(-90)")
+			.attr("transform", "rotate(-90)");
 
-      const legend = d3.select("#q3legend")
-									.style("width", dimensions.width)
-									.style("height", dimensions.height/6)
+		svg.on("genre_change", (g) => {
+      	xScale = d3.scaleLinear()
+								.domain(d3.extent(datasetGenre.get(g.detail.genre), d => +d.budget))
+								.range([dimensions.margin.left, dimensions.width-dimensions.margin.right]);
+ 
+  			yScale = d3.scaleLinear()
+								.domain(d3.extent(datasetGenre.get(g.detail.genre), d => +d.revenue))
+								.range([dimensions.height - dimensions.margin.top, dimensions.margin.bottom]);
 
-		var rects = legend.append("g")
-									.selectAll("rect")
-									.data(dataset)
-									.enter()
-									.append("rect")
-									.attr("y", 0)
-									.attr("x", function(d, i){return dimensions.width*i/20})
-									.attr("width", 18)
-									.attr("height", 18)
-									.attr("fill", function(d, i){return colors[i]})
-	
-   	var labels = legend.append("g")
-									.selectAll("text")
-									.data(dataset)
-									.enter()
-									.append("text")
-									.style("font-size", "7px")
-									.attr("y", dimensions.height/12)
-									.attr("x", function(d, i){return dimensions.width*i/20})
-									.text(d => d.primary_genre)
+			yAxis = d3.axisLeft().scale(yScale);
+			xAxis = d3.axisBottom().scale(xScale);
+			yAxisGroup.transition(100).call(yAxis);
+			xAxisGroup.transition(100).call(xAxis); 
+
+         dots.remove();
+
+         dots = svg.append("g")
+								.selectAll("circle")
+								.data(datasetGenre.get(g.detail.genre))
+								.enter()
+								.append("circle")
+								.attr("cx", d => xScale(d.budget))
+								.attr("cy", d => yScale(d.revenue))
+								.attr("r", 5)                   
+								.attr("fill", genreColor[g.detail.genre]); 
+			});
+
+		d3.selectAll('.legend-button').on("mouseover", (b) => {
+			var genre = b.target.textContent;
+			xScale = d3.scaleLinear()
+								.domain(d3.extent(datasetGenre.get(genre), d => +d.budget))
+								.range([dimensions.margin.left, dimensions.width-dimensions.margin.right]);
+ 
+  			yScale = d3.scaleLinear()
+								.domain(d3.extent(datasetGenre.get(genre), d => +d.revenue))
+								.range([dimensions.height - dimensions.margin.top, dimensions.margin.bottom]);
+
+			yAxis = d3.axisLeft().scale(yScale);
+			xAxis = d3.axisBottom().scale(xScale);
+			yAxisGroup.transition(100).call(yAxis);
+			xAxisGroup.transition(100).call(xAxis); 
+
+         dots.remove();
+
+         dots = svg.append("g")
+								.selectAll("circle")
+								.data(datasetGenre.get(genre))
+								.enter()
+								.append("circle")
+								.attr("cx", d => xScale(d.budget))
+								.attr("cy", d => yScale(d.revenue))
+								.attr("r", 5)                   
+								.attr("fill", genreColor[genre]); 
+
+		});
+
+		d3.select('#clear').on("mouseover", function() {
+
+			text.text("");
+
+			xScale = d3.scaleLinear()
+								.domain(d3.extent(datasetAvg, d => +d[1]))
+								.range([dimensions.margin.left, dimensions.width-dimensions.margin.right]);
+
+			yScale = d3.scaleLinear()
+								.domain(d3.extent(datasetAvg, d => +d[2]))
+								.range([dimensions.height - dimensions.margin.top, dimensions.margin.bottom]);
+          
+			yAxis = d3.axisLeft().scale(yScale);
+			xAxis = d3.axisBottom().scale(xScale);
+			yAxisGroup.transition(100).call(yAxis);
+			xAxisGroup.transition(100).call(xAxis);
+
+			dots.remove();
+
+         dots = svg.append("g")
+								.selectAll("circle")
+								.data(datasetAvg)
+								.enter()
+								.append("circle")
+								.attr("cx", d => xScale(d[1]))
+								.attr("cy", d => yScale(d[2]))
+								.attr("r", 5)                   
+								.on("mouseover", function(d, i){
+									d3.select(this)
+										.attr("opacity", .8)
+										.attr("r", 8);
+									text.text(i[0]);
+								})
+								.on("mouseout", function(){
+									d3.select(this)
+										.attr("opacity", 1)
+										.attr("r", 5);
+									text.text("");
+								})
+								.on("click", (d, i) => {
+									d3.selectAll("#q1canvas")
+										.dispatch("genre_change", {detail: {genre: i[0]}});
+									d3.selectAll("#q3scatterplot")
+										.dispatch("genre_change", {detail: {genre: i[0]}});
+								})                           
+								.attr("fill", function(d, i){return genreColor[d[0]]});  
+			
+		});
+
+
 	}
 )
