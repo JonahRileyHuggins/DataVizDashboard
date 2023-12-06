@@ -172,7 +172,7 @@ d3.csv('data/q2_data.csv').then(function(data) {
     
 
 // Functionality for the buttons. 
-  d3.selectAll('.legend-button').on("mouseenter", (b) => {
+  d3.selectAll('.legend-button').on("mousedown", (b) => {
     var genre = b.target.textContent;
 
      xScale = d3.scaleBand()
@@ -205,7 +205,7 @@ d3.csv('data/q2_data.csv').then(function(data) {
 
 
   // Functionality for the clear button
-  d3.select('#clear').on("mouseenter", (b) => {
+  d3.select('#clear').on("mousedown", (b) => {
 
     text.text("");
 
