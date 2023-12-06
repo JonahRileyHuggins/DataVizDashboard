@@ -123,7 +123,7 @@ d3.csv('data/q2_data.csv').then(function(data) {
       rating: d.rating,
       [genres]: d[genreColumn]
     }));
-    console.log(genreData.d[genreColumn])
+    
     var yScale = d3.scaleLinear()
           .domain([0, d3.max(genreData, d => d[genres])])
           .range([dimensions.height - dimensions.margin.bottom, dimensions.margin.top]);
