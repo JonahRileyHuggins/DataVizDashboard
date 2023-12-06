@@ -17,16 +17,28 @@ d3.csv('data/q2_data.csv').then(function(data) {
       }
     }
 
+
+  // Plot specifics block  
   var svg = d3.select("#barchart")
     .style("width", dimensions.width + "px")
     .style("height", dimensions.height + "px");
 
+  const genres = ["Action","Adventure","Animation","Comedy","Crime",
+      "Documentary","Drama","Family","Fantasy","Foreign",
+      "History","Horror","Music","Mystery","Romance",
+      "Science Fiction","TV Movie","Thriller","War","Western"];
 
-  var xScale = d3.scaleBand()
-    .domain(d3.map(data, d => +d.rating))
-    .range([dimensions.margin.left, dimensions.width - dimensions.margin.right])
-    .padding(0.2)
+  const colors = ["red", "blue", "green", "orange", "purple", 
+      "maroon", "brown", "steelblue", "pink", "black", 
+      "gray", "aquamarine", "coral", "darkgoldenrod", "darkseagreen",
+      "greenyellow", "olive", "indigo", "lavender", "mediumslateblue"]
 
+  var genreColor = {};
+  for (var i = 0; i < genres.length; i++) {
+  genreColor[genres[i]] = colors[i];
+  }
+  
+  // Data processing block
   var keys = data.columns.slice(2);
 
   var maximum = d3.max(data, function (d){ 
@@ -37,27 +49,46 @@ d3.csv('data/q2_data.csv').then(function(data) {
     return sumName
   })
 
+  var stackedData = d3.stack()
+  .keys(keys)
+  (data)
+
+  //Defining Text Block
+  var text = svg.append("text")
+    .attr("id", 'descriptionText')
+    .attr("x", dimensions.width*0.75)
+    .attr("y", dimensions.height*0.1)
+    .attr("dx", "-.8em")
+    .attr("dy", ".15em")
+    .attr("font-family", "sans-serif")
+    .text("");
+
+
+  // Plotting block
+  var xScale = d3.scaleBand()
+  .domain(d3.map(data, d => +d.rating))
+  .range([dimensions.margin.left, dimensions.width - dimensions.margin.right])
+  .padding(0.2)
+
+  xAxis = d3.axisBottom().scale(xScale);
+  const xAxisGroup = svg.append("g")
+      .call(xAxis)
+      .attr("transform", `translate(0, ${dimensions.height - dimensions.margin.bottom})`)
+      .attr('color', 'black');
+
   var yScale = d3.scaleLinear()
     .domain([0, maximum])
     .range([dimensions.height - dimensions.margin.bottom, dimensions.margin.top]);
 
-
-  const genres = ["Action","Adventure","Animation","Comedy","Crime",
-              "Documentary","Drama","Family","Fantasy","Foreign",
-              "History","Horror","Music","Mystery","Romance",
-              "Science Fiction","TV Movie","Thriller","War","Western"];
-
-  
-  const colors = ["red", "blue", "green", "orange", "purple", 
-							"maroon", "brown", "steelblue", "pink", "black", 
-							"gray", "aquamarine", "coral", "darkgoldenrod", "darkseagreen",
-							"greenyellow", "olive", "indigo", "lavender", "mediumslateblue"]
-
-  var stackedData = d3.stack()
-    .keys(keys)
-    (data)
+  yAxis = d3.axisLeft().scale(yScale);
+  const yAxisGroup = svg.append("g")
+      .call(yAxis)
+      .style("transform", `translateX(${dimensions.margin.left}px`)
+      .attr("color", "black");
 
 
+
+  // Stacked Bars block
   var bars = svg.append("g")
     .selectAll("g")
     .data(stackedData)
@@ -72,270 +103,129 @@ d3.csv('data/q2_data.csv').then(function(data) {
     .attr("y", d => yScale(+d[1]))
     .attr("height", d => yScale(+d[0]) - yScale(+d[1]))
     .attr("width", d => xScale.bandwidth())
-    .attr("stroke", "white")
     .on('mouseover', function (d, i) {
-      d3.select(this).transition()
-            .duration('50')
-            .attr('opacity', '.85')})
+      d3.select(this)
+            .attr('opacity', .5);
+            text.text(i[1]);
+    })
     .on('mouseout', function (d, i) {
-        d3.select(this).transition()
-              .duration('50')
-              .attr('opacity', '1')})
+        d3.select(this)
+              .attr('opacity', '1');
+              text.text("");
+    })
+    .on('click', (d, i) => {
+      d3.selectAll("#q1canvas")
+        .dispatch("genre_change", {detail: {genre: i[0]}});
+      d3.select('#barchart')
+        .dispatch("genre_change", {detail: {genre: i[0]}});
+    });
 
-      // Add x-axis
-  svg.append("g")
-    .attr("transform", "translate(20," + (dimensions.height - dimensions.margin.bottom) + ")")
-    .call(d3.axisBottom(xScale));
-
-  // Add y-axis
-  svg.append("g")
-    .attr("transform", "translate(" + dimensions.margin.left + ",0)")
-    .call(d3.axisLeft(yScale));
-
+// Legend block
   // Add x-axis label
   svg.append("text")
-    .attr("transform", "translate(" + (dimensions.width / 2) + " ," +
-      (dimensions.height - dimensions.margin.bottom + 40) + ")")
-    .style("text-anchor", "middle")
-    .text("Rating");
+    .text("Rating")
+    .attr("x", dimensions.width / 2)
+    .attr("y", dimensions.height -5)
+    .attr("text-anchor", "middle")
+    .attr("font-size", "24px");
 
   // Add y-axis label
   svg.append("text")
-    .attr("transform", "rotate(-90)")
-    // .attr("y", 0 - dimensions.margin.left)
-    .attr("y", 50 - (dimensions.margin.left /2))
-    .attr("x", 0 - (dimensions.height / 2))
-    .attr("dy", "1em")
-    .style("text-anchor", "middle")
-    .text("Average Revenue");
+    .text("Average Revenue")
+    .attr("x", -dimensions.height / 2)
+    .attr("y", dimensions.margin.left / 3.6)
+    .attr("text-anchor", "middle")
+    .attr("font-size", "24px")
+    .attr("transform", "rotate(-90)");
 
-// Here, I want to add in the functionality for the buttons. 
-  d3.select(".legend-button").on("click", function(){
-    var genres = d3.select(this).attr("id").toLowerCase();
-    var genreColumn = data.columns.find(column => column.toLowerCase() === genres);
-    var genreColor = colors[genres.indexOf(genres)]
-    // removing the previous bars
-    svg.selectAll("g")
-       .remove()
-    
-    var genreData = data.map(d => ({
-      gender: d.gender,
-      rating: d.rating,
-      [genres]: d[genreColumn]
-    }));
-    
-    var yScale = d3.scaleLinear()
-          .domain([0, d3.max(genreData, d => d[genres])])
-          .range([dimensions.height - dimensions.margin.bottom, dimensions.margin.top]);
 
-    var genreBar = svg.append("g")
+
+// Functionality displaying genres on click
+  svg.on("genre_change", (g) => {
+    xScale = d3.scaleBand()
+      .domain(d3.map(data, d => +d.rating))
+      .range([dimensions.margin.left, dimensions.width - dimensions.margin.right])
+
+    yScale = d3.scaleLinear()
+      .domain(d3.extent(data, d => +d[g.detail.genre]))
+      .range([dimensions.height - dimensions.margin.bottom, dimensions.margin.top]);
+
+    yAxis = d3.axisLeft().scale(yScale);
+    xAxis = d3.axisBottom().scale(xScale);
+    yAxisGroup.transition(100).call(yAxis);
+    xAxisGroup.transition(100).call(xAxis); 
+
+    bars.remove();
+
+    bars = svg.append("g")
       .selectAll("rect")
-      .data(genreData)
+      .data(data, d => d[g.detail.genre])
       .enter()
       .append("rect")
       .attr("x", d => xScale(+d.rating))
-      .attr("y", d => yScale(+d[genres]))
-      .attr("height", d => yScale(0) - yScale(+d[genres]))
+      .attr("y", d => yScale(+d[g.detail.genre]))
+      .attr("height", d => yScale(0) - yScale(+d[g.detail.genre]))
       .attr("width", d => xScale.bandwidth())
-      .attr("fill", genreColor)
+      .attr("fill", genreColor[g.detail.genre]);
 
-      
-    // Add x-axis
-    svg.append("g")
-      .attr("transform", "translate(20," + (dimensions.height - dimensions.margin.bottom) + ")")
-      .call(d3.axisBottom(xScale));
-
-    // Add y-axis
-    svg.append("g")
-      .attr("transform", "translate(" + dimensions.margin.left + ",0)")
-      .call(d3.axisLeft(yScale));
-
-    // Add x-axis label
-    svg.append("text")
-      .attr("transform", "translate(" + (dimensions.width / 2) + " ," +
-        (dimensions.height - dimensions.margin.bottom + 40) + ")")
-      .style("text-anchor", "middle")
-      .text("Rating");
-
-    // Add y-axis label
-    svg.append("text")
-      .attr("transform", "rotate(-90)")
-      // .attr("y", 0 - dimensions.margin.left)
-      .attr("y", 50 - (dimensions.margin.left /2))
-      .attr("x", 0 - (dimensions.height / 2))
-      .attr("dy", "1em")
-      .style("text-anchor", "middle")
-      .text("Average Revenue");
-
-  })
-
-// Click event for 'female' button
-  d3.select('#female').on("click", function () {
-    var fem = data.filter(function (d) {
-      return d.gender === " Female";
-    });
-
-    var stackedFemaleData = d3.stack()
-      .keys(keys)
-      (fem);
+  });
     
-    var yScale = d3.scaleLinear()
-      .domain([0, d3.max(fem, function (d) {
-        var sumName = 0;
-        for (var i = 0; i < keys.length; i++) {
-          sumName = sumName + parseFloat(d[keys[i]]);
-        }
-        return sumName;
-      })])
+
+// Functionality for the buttons. 
+  d3.selectAll('.legend-button').on("mouseenter", (b) => {
+    var genre = b.target.textContent;
+
+     xScale = d3.scaleBand()
+      .domain(d3.map(data, d => +d.rating))
+      .range([dimensions.margin.left, dimensions.width - dimensions.margin.right])
+      .padding(0.2)
+
+    yScale = d3.scaleLinear()
+      .domain(d3.extent(data, d => +d[genre]))
       .range([dimensions.height - dimensions.margin.bottom, dimensions.margin.top]);
-    
-    // removing the previous bars
-    svg.selectAll("g")
-      .remove()
- 
-    // Create new fem-data bars
-    var bars = svg.append("g")
-      .selectAll("g")
-      .data(stackedFemaleData)
-      .enter()
-      .append("g")
-      .attr("fill", function(d, i){return colors[i]})
+
+    yAxis = d3.axisLeft().scale(yScale);
+    xAxis = d3.axisBottom().scale(xScale);
+    yAxisGroup.transition(100).call(yAxis);
+    xAxisGroup.transition(100).call(xAxis); 
+
+    bars.remove();
+
+    bars = svg.append("g")
       .selectAll("rect")
-      .data(function (d) {return d;})
+      .data(data, d => d[genre])
       .enter()
       .append("rect")
-      .attr("x", d => xScale(+d.data.rating))
-      .attr("y", d => yScale(+d[1]))
-      .attr("height", d => yScale(+d[0]) - yScale(+d[1]))
+      .attr("x", d => xScale(+d.rating))
+      .attr("y", d => yScale(+d[genre]))
+      .attr("height", d => yScale(0) - yScale(+d[genre]))
       .attr("width", d => xScale.bandwidth())
-      .attr("stroke", "white")
-      //Our new hover effects
-      .on('mouseover', function (d, i) {
-        d3.select(this).transition()
-              .duration('50')
-              .attr('opacity', '.85')})
-      .on('mouseout', function (d, i) {
-          d3.select(this).transition()
-                .duration('50')
-                .attr('opacity', '1')})
-
-      // Add x-axis
-      svg.append("g")
-      .attr("transform", "translate(0," + (dimensions.height - dimensions.margin.bottom) + ")")
-      .call(d3.axisBottom(xScale));
-  
-      // Add y-axis
-      svg.append("g")
-        .attr("transform", "translate(" + dimensions.margin.left + ",0)")
-        .call(d3.axisLeft(yScale));
-    
-      // Add x-axis label
-      svg.append("text")
-        .attr("transform", "translate(" + (dimensions.width / 2) + " ," +
-          (dimensions.height - dimensions.margin.bottom + 40) + ")")
-        .style("text-anchor", "middle")
-        .text("Rating");
-    
-      // Add y-axis label
-      svg.append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 0 - dimensions.margin.left)
-        .attr("x", 0 - (dimensions.height / 2 ))
-        .attr("dy", "1em")
-        .style("text-anchor", "middle")
-        .text("Total Revenue");
-  })
+      .attr("fill", genreColor[genre]);
+  });
 
 
-  // Time to add in the male data
-  d3.select('#male').on("click", function(){
-    var men = data.filter(function(d){
-      return d.gender ===" Male"
-    })
-    var stackedMaleData = d3.stack()
-      .keys(keys)
-      (men)
+  // Functionality for the clear button
+  d3.select('#clear').on("mouseenter", (b) => {
 
-    var yScale = d3.scaleLinear()
-    .domain([0, d3.max(men, function (d) {
-      var sumName = 0;
-      for (var i = 0; i < keys.length; i++) {
-        sumName = sumName + parseFloat(d[keys[i]]);
-      }
-      return sumName;
-    })])
+    text.text("");
+
+    xScale = d3.scaleBand()
+      .domain(d3.map(data, d => +d.rating))
+      .range([dimensions.margin.left, dimensions.width - dimensions.margin.right])
+      .padding(0.2)
+
+    yScale = d3.scaleLinear()
+      .domain([0, maximum])
       .range([dimensions.height - dimensions.margin.bottom, dimensions.margin.top]);
-    // removing the previous bars
-    svg.selectAll("g")
-      .remove()
-
-    // Update the existing bars
-    var bars = svg.append("g")
-      .selectAll("g")
-      .data(stackedMaleData)
-      .enter()
-      .append("g")
-      .attr("fill", function(d, i){return colors[i]})
-      .selectAll("rect")
-      .data(function (d) {return d;})
-      .enter()
-      .append("rect")
-      .attr("x", d => xScale(+d.data.rating))
-      .attr("y", d => yScale(+d[1]))
-      .attr("height", d => yScale(+d[0]) - yScale(+d[1]))
-      .attr("width", d => xScale.bandwidth())
-      .attr("stroke", "white")
-      //Our new hover effects
-      .on('mouseover', function (d, i) {
-        d3.select(this).transition()
-              .duration('50')
-              .attr('opacity', '.85')})
-      .on('mouseout', function (d, i) {
-          d3.select(this).transition()
-                .duration('50')
-                .attr('opacity', '1')})
-
-      // Add x-axis
-      svg.append("g")
-      .attr("transform", "translate(0," + (dimensions.height - dimensions.margin.bottom) + ")")
-      .call(d3.axisBottom(xScale));
-  
-      // Add y-axis
-      svg.append("g")
-        .attr("transform", "translate(" + dimensions.margin.left + ",0)")
-        .call(d3.axisLeft(yScale));
     
-      // Add x-axis label
-      svg.append("text")
-        .attr("transform", "translate(" + (dimensions.width / 2) + " ," +
-          (dimensions.height - dimensions.margin.bottom + 40) + ")")
-        .style("text-anchor", "middle")
-        .text("Rating");
-    
-      // Add y-axis label
-      svg.append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 0 - dimensions.margin.left)
-        .attr("x", 0 - (dimensions.height / 2 ))
-        .attr("dy", "1em")
-        .style("text-anchor", "middle")
-        .text("Total Revenue");
-  })
+    yAxis = d3.axisLeft().scale(yScale);
+    xAxis = d3.axisBottom().scale(xScale);
+    yAxisGroup.transition(100).call(yAxis);
+    xAxisGroup.transition(100).call(xAxis);
 
+    bars.remove();
 
-  // Now creating a function to return it to the combined data. 
-  d3.select('#combined').on("click", function(){
-
-    var stackedData = d3.stack()
-      .keys(keys)
-      (data)
-
-    // removing the previous bars
-    svg.selectAll("g")
-      .remove()
-
-    // Update the existing bars
-    var bars = svg.append("g")
+    bars = svg.append("g")
       .selectAll("g")
       .data(stackedData)
       .enter()
@@ -349,44 +239,21 @@ d3.csv('data/q2_data.csv').then(function(data) {
       .attr("y", d => yScale(+d[1]))
       .attr("height", d => yScale(+d[0]) - yScale(+d[1]))
       .attr("width", d => xScale.bandwidth())
-      .attr("stroke", "white")
-            //Our new hover effects
       .on('mouseover', function (d, i) {
-        d3.select(this).transition()
-              .duration('50')
-              .attr('opacity', '.85')})
+        d3.select(this)
+              .attr('opacity', .5);
+              text.text(i[1]);
+      })
       .on('mouseout', function (d, i) {
-          d3.select(this).transition()
-                .duration('50')
-                .attr('opacity', '1')})
-
-      // Add x-axis
-      svg.append("g")
-      .attr("transform", "translate(0," + (dimensions.height - dimensions.margin.bottom) + ")")
-      .call(d3.axisBottom(xScale));
-  
-      // Add y-axis
-      svg.append("g")
-        .attr("transform", "translate(" + dimensions.margin.left + ",0)")
-        .call(d3.axisLeft(yScale));
-    
-      // Add x-axis label
-      svg.append("text")
-        .attr("transform", "translate(" + (dimensions.width / 2) + " ," +
-          (dimensions.height - dimensions.margin.bottom + 40) + ")")
-        .style("text-anchor", "middle")
-        .text("Rating");
-    
-      // Add y-axis label
-      svg.append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 0 - dimensions.margin.left)
-        .attr("x", 0 - (dimensions.height / 2 ))
-        .attr("dy", "1em")
-        .style("text-anchor", "middle")
-        .text("Total Revenue");
-
-  })
-
-
+          d3.select(this)
+                .attr('opacity', '1');
+                text.text("");
+      })
+      .on('click', (d, i) => {
+        d3.selectAll("#q1canvas")
+          .dispatch("genre_change", {detail: {genre: i[0]}});
+        d3.select('#barchart')
+          .dispatch("genre_change", {detail: {genre: i[0]}});
+      });
+  });
 });
