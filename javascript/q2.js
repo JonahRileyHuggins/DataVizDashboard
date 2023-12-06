@@ -114,6 +114,7 @@ d3.csv('data/q2_data.csv').then(function(data) {
               text.text("");
     })
     .on('click', (d, i) => {
+      console.log(i)
       d3.selectAll("#q1canvas")
         .dispatch("genre_change", {detail: {genre: i[0]}});
       d3.select('#barchart')
