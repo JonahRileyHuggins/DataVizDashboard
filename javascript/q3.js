@@ -142,7 +142,7 @@ d3.csv("data/q3_data.csv").then(function(dataset)
 								.attr("fill", genreColor[g.detail.genre]); 
 			});
 
-		d3.selectAll('.legend-button').on("mouseover", (b) => {
+		d3.selectAll('.legend-button').on("mouseup", (b) => {
 			var genre = b.target.textContent;
 			xScale = d3.scaleLinear()
 								.domain(d3.extent(datasetGenre.get(genre), d => +d.budget))
@@ -171,7 +171,7 @@ d3.csv("data/q3_data.csv").then(function(dataset)
 
 		});
 
-		d3.select('#clear').on("mouseover", function() {
+		d3.select('#clear').on("mouseup", function() {
 
 			text.text("");
 
