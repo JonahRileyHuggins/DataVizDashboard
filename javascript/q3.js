@@ -1,5 +1,5 @@
 //d3.csv("javascript/profit_by_genre.csv").then(function(dataset) 
-d3.csv("data/q3_data.csv").then(function(dataset) 
+d3.csv("data/movies_metadata.csv").then(function(dataset) 
 	{
 		const dimensions = {
 			width: 800,
@@ -12,7 +12,7 @@ d3.csv("data/q3_data.csv").then(function(dataset)
 			},
 		}
 
-		var datasetGenre = d3.group(dataset, (d) => {return d.primary_genre})
+		var datasetGenre = d3.group(dataset, (d) => {return d.genres.split(",")[0]})
 
 		const svg = d3.select("#q3scatterplot")
 			.style("width", dimensions.width)
@@ -33,8 +33,9 @@ d3.csv("data/q3_data.csv").then(function(dataset)
 			genreColor[genres[i]] = colors[i];
 		}
                              
-		var datasetAvgRev = d3.rollup(dataset, v => d3.mean(v, d => d.revenue), d => d.primary_genre);
-		var datasetAvgBud = d3.rollup(dataset, v => d3.mean(v, d => d.budget), d => d.primary_genre);
+		var datasetAvgRev = d3.rollup(dataset, v => d3.mean(v, d => d.revenue), (d) => d.genres.split(",")[0]);
+		var datasetAvgBud = d3.rollup(dataset, v => d3.mean(v, d => d.budget), (d) => d.genres.split(",")[0]);
+
       var datasetAvg = [];        
       for(var i = 0; i < genres.length; i++)
 			datasetAvg[i] = [genres[i], +datasetAvgBud.get(genres[i]), +datasetAvgRev.get(genres[i])];
@@ -59,6 +60,16 @@ d3.csv("data/q3_data.csv").then(function(dataset)
 								.attr("dy", ".15em")
 								.attr("font-family", "sans-serif")
 								.text("");
+		
+		var tooltip = svg.append("text")
+								.attr("id", 'descriptionText')
+								.attr("x", dimensions.width*0.36)
+								.attr("y", dimensions.height*0.1)
+								.attr("dx", "-.8em")
+								.attr("dy", ".15em")
+								.attr("font-family", "sans-serif")
+								.attr("font-size", "14px")
+								.text("");
 
 		var dots = svg.append("g")
 								.selectAll("circle")
@@ -81,6 +92,7 @@ d3.csv("data/q3_data.csv").then(function(dataset)
 									text.text("");
 								})
 								.on("click", (d, i) => {
+									text.text(i[0]);
 									d3.selectAll("#q1canvas")
 										.dispatch("genre_change", {detail: {genre: i[0]}});
 									d3.selectAll("#barchart")
@@ -140,12 +152,25 @@ d3.csv("data/q3_data.csv").then(function(dataset)
 								.append("circle")
 								.attr("cx", d => xScale(d.budget))
 								.attr("cy", d => yScale(d.revenue))
-								.attr("r", 5)                   
+								.attr("r", 5)
+								.on("mouseover", function(d, i){
+									d3.select(this)
+										.attr("opacity", .8)
+										.attr("r", 8);
+									tooltip.text("\""+i.title+"\", "+i.release_date);
+								})
+								.on("mouseout", function(){
+									d3.select(this)
+										.attr("opacity", 1)
+										.attr("r", 5);
+									tooltip.text("");
+								})
 								.attr("fill", genreColor[g.detail.genre]); 
 			});
 
 		d3.selectAll('.legend-button').on("mouseup", (b) => {
 			var genre = b.target.textContent;
+			text.text(genre);
 			xScale = d3.scaleLinear()
 								.domain(d3.extent(datasetGenre.get(genre), d => +d.budget))
 								.range([dimensions.margin.left, dimensions.width-dimensions.margin.right]);
@@ -168,7 +193,19 @@ d3.csv("data/q3_data.csv").then(function(dataset)
 								.append("circle")
 								.attr("cx", d => xScale(d.budget))
 								.attr("cy", d => yScale(d.revenue))
-								.attr("r", 5)                   
+								.attr("r", 5)
+								.on("mouseover", function(d, i){
+									d3.select(this)
+										.attr("opacity", .8)
+										.attr("r", 8);
+									tooltip.text("\""+i.title+"\", "+i.release_date);
+								})
+								.on("mouseout", function(){
+									d3.select(this)
+										.attr("opacity", 1)
+										.attr("r", 5);
+									tooltip.text("");
+								})
 								.attr("fill", genreColor[genre]); 
 
 		});
@@ -213,11 +250,14 @@ d3.csv("data/q3_data.csv").then(function(dataset)
 									text.text("");
 								})
 								.on("click", (d, i) => {
+									text.text(i[0]);
 									d3.selectAll("#q1canvas")
+										.dispatch("genre_change", {detail: {genre: i[0]}});
+									d3.selectAll("#barchart")
 										.dispatch("genre_change", {detail: {genre: i[0]}});
 									d3.selectAll("#q3scatterplot")
 										.dispatch("genre_change", {detail: {genre: i[0]}});
-								})                           
+								})                              
 								.attr("fill", function(d, i){return genreColor[d[0]]});  
 			
 		});
