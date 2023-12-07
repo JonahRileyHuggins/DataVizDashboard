@@ -25,10 +25,6 @@ button {
   margin: 2px;
 }
 
-/* Apply color-coding to buttons */
-button#combined { background-color: red; }
-button#female { background-color: blue; }
-button#male { background-color: green; }
 
 /* Add color-coding for each genre button */
 button#action { background-color: red; }
@@ -51,7 +47,7 @@ button#tv-movie { background-color: olive; }
 button#thriller { background-color: indigo; }
 button#war { background-color: lavender; }
 button#western { background-color: mediumslateblue; }
-
+button#clear-selection { background-color: white; color: black; }
 .legend {
   position: absolute;
   width: 50%;

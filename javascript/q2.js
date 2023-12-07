@@ -106,7 +106,7 @@ d3.csv('data/q2_data.csv').then(function(data) {
     .on('mouseover', function (d, i) {
       d3.select(this)
             .attr('opacity', .5);
-            text.text(i[1]);
+            text.text(i[1] - i[0]);
     })
     .on('mouseout', function (d, i) {
         d3.select(this)
@@ -147,7 +147,7 @@ d3.csv('data/q2_data.csv').then(function(data) {
       .domain(d3.map(data, d => +d.rating))
       .range([dimensions.margin.left, dimensions.width - dimensions.margin.right])
       .padding(0.2)
-      
+
     yScale = d3.scaleLinear()
       .domain(d3.extent(data, d => +d[g.detail.genre]))
       .range([dimensions.height - dimensions.margin.bottom, dimensions.margin.top]);
@@ -244,7 +244,7 @@ d3.csv('data/q2_data.csv').then(function(data) {
       .on('mouseover', function (d, i) {
         d3.select(this)
               .attr('opacity', .5);
-              text.text(i[1]);
+              text.text(i[0]);
       })
       .on('mouseout', function (d, i) {
           d3.select(this)
