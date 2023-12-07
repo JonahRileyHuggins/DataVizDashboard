@@ -130,6 +130,7 @@ d3.csv("data/movies_metadata.csv").then(function(dataset)
 			.attr("transform", "rotate(-90)");
 
 		svg.on("genre_change", (g) => {
+		text.text(g.detail.genre);
       	xScale = d3.scaleLinear()
 								.domain(d3.extent(datasetGenre.get(g.detail.genre), d => +d.budget))
 								.range([dimensions.margin.left, dimensions.width-dimensions.margin.right]);
