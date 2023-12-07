@@ -83,6 +83,8 @@ d3.csv("data/q3_data.csv").then(function(dataset)
 								.on("click", (d, i) => {
 									d3.selectAll("#q1canvas")
 										.dispatch("genre_change", {detail: {genre: i[0]}});
+									d3.selectAll("#barchart")
+										.dispatch("genre_change", {detail: {genre: i[0]}});
 									d3.selectAll("#q3scatterplot")
 										.dispatch("genre_change", {detail: {genre: i[0]}});
 								})                           
