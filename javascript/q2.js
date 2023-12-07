@@ -146,7 +146,8 @@ d3.csv('data/q2_data.csv').then(function(data) {
     xScale = d3.scaleBand()
       .domain(d3.map(data, d => +d.rating))
       .range([dimensions.margin.left, dimensions.width - dimensions.margin.right])
-
+      .padding(0.2)
+      
     yScale = d3.scaleLinear()
       .domain(d3.extent(data, d => +d[g.detail.genre]))
       .range([dimensions.height - dimensions.margin.bottom, dimensions.margin.top]);

@@ -119,14 +119,14 @@ d3.csv("data/movies_metadata.csv").then(function(dataset)
 			.attr("x", dimensions.width / 2)
 			.attr("y", dimensions.height - 5)
 			.attr("text-anchor", "middle")
-			.attr("font-size", "14px");
+			.attr("font-size", "24px");
 
 		svg.append("text")
 			.text("Revenue")
 			.attr("x", -dimensions.height / 2)
 			.attr("y", dimensions.margin.left / 3)
 			.attr("text-anchor", "middle")
-			.attr("font-size", "14px")
+			.attr("font-size", "24px")
 			.attr("transform", "rotate(-90)");
 
 		svg.on("genre_change", (g) => {
