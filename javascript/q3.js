@@ -100,7 +100,33 @@ d3.csv("data/movies_metadata.csv").then(function(dataset)
 									d3.selectAll("#q3scatterplot")
 										.dispatch("genre_change", {detail: {genre: i[0]}});
 								})                           
-								.attr("fill", function(d, i){return genreColor[d[0]]});  
+								.attr("fill", function(d, i){return genreColor[d[0]]});
+			
+		//Draw profitability line
+		var lineData = d3.extent(datasetAvg, d => +d[1]);
+
+		var lineFunction = d3.line()
+			.x(d => xScale(d))
+			.y(d => yScale(d*2));
+
+		var line = svg.append('path')
+							.attr('d', lineFunction(lineData))
+							.style("stroke-dasharray", ("3, 3"))
+							.attr("fill", "none")
+							.attr("stroke", "black")
+							.attr("stroke-width", 3.0)
+							.on("mouseover", function(d, i){
+								d3.select(this)
+									.attr("opacity", .8)
+									.attr("r", 8);
+								text.text("Profitability Line");
+							})
+							.on("mouseout", function(){
+								d3.select(this)
+									.attr("opacity", 1)
+									.attr("r", 5);
+								text.text("");
+							})
 
 		var xAxis = d3.axisBottom().scale(xScale);
 		const xAxisGroup = svg.append("g")
@@ -166,7 +192,34 @@ d3.csv("data/movies_metadata.csv").then(function(dataset)
 										.attr("r", 5);
 									tooltip.text("");
 								})
-								.attr("fill", genreColor[g.detail.genre]); 
+								.attr("fill", genreColor[g.detail.genre]);
+		
+		 line.remove();
+		
+		 lineData = d3.extent(datasetGenre.get(g.detail.genre), d => +d.budget);
+
+		 lineFunction = d3.line()
+			 .x(d => xScale(d))
+			 .y(d => yScale(d*2));
+
+		 line = svg.append('path')
+							.attr('d', lineFunction(lineData))
+							.style("stroke-dasharray", ("3, 3"))
+							.attr("fill", "none")
+							.attr("stroke", "black")
+							.attr("stroke-width", 3.0)
+							.on("mouseover", function(d, i){
+								d3.select(this)
+									.attr("opacity", .8)
+									.attr("r", 8);
+								tooltip.text("Profitability Line");
+							})
+							.on("mouseout", function(){
+								d3.select(this)
+									.attr("opacity", 1)
+									.attr("r", 5);
+								tooltip.text("");
+							})
 			});
 
 		d3.selectAll('.legend-button').on("mouseup", (b) => {
@@ -208,6 +261,33 @@ d3.csv("data/movies_metadata.csv").then(function(dataset)
 									tooltip.text("");
 								})
 								.attr("fill", genreColor[genre]); 
+
+		 line.remove();
+		
+		 lineData = d3.extent(datasetGenre.get(genre), d => +d.budget);
+
+		 lineFunction = d3.line()
+			 .x(d => xScale(d))
+			 .y(d => yScale(d*2));
+
+		 line = svg.append('path')
+							.attr('d', lineFunction(lineData))
+							.style("stroke-dasharray", ("3, 3"))
+							.attr("fill", "none")
+							.attr("stroke", "black")
+							.attr("stroke-width", 3.0)
+							.on("mouseover", function(d, i){
+								d3.select(this)
+									.attr("opacity", .8)
+									.attr("r", 8);
+								tooltip.text("Profitability Line");
+							})
+							.on("mouseout", function(){
+								d3.select(this)
+									.attr("opacity", 1)
+									.attr("r", 5);
+								tooltip.text("");
+							})
 
 		});
 
@@ -260,7 +340,21 @@ d3.csv("data/movies_metadata.csv").then(function(dataset)
 										.dispatch("genre_change", {detail: {genre: i[0]}});
 								})                              
 								.attr("fill", function(d, i){return genreColor[d[0]]});  
-			
+
+		 line.remove();
+		
+		 lineData = d3.extent(datasetAvg, d => +d[1]);
+
+		 lineFunction = d3.line()
+			 .x(d => xScale(d))
+			 .y(d => yScale(d*2));
+
+		 line = svg.append('path')
+							.attr('d', lineFunction(lineData))
+							.style("stroke-dasharray", ("3, 3"))
+							.attr("fill", "none")
+							.attr("stroke", "black")
+							.attr("stroke-width", 1.0)
 		});
 
 
