@@ -31,13 +31,14 @@ d3.csv("data/movies_metadata.csv").then(
 
         //Aggregate data by year and filter to date range
         const filterYearMin = 1930;
-        const filterYearMax = 2020;
+        const filterYearMax = 2016;
         sort_data = sort_data.filter((d) => {return (d.release_year >= filterYearMin && d.release_year <= filterYearMax)});
         //const rev_data = d3.rollups(sort_data, (v) => d3.sum(v, (d) => +d.revenue), (d) => d.release_year, (d) => d.genres.split(",")[0])
         //                   .flatMap((d) => {return d[1].map((a) => {return {"release_year":+d[0], "genre":a[0], "revenue":+a[1]}})});
         
         const rev_data = d3.rollups(sort_data, (v) => d3.count(v, (d) => d.release_year), (d) => d.release_year, (d) => d.genres.split(",")[0])
                            .flatMap((d) => {return d[1].map((a) => {return {"release_year":+d[0], "genre":a[0], "revenue":+a[1]}})});
+                        
 
         var genre_rev = d3.group(rev_data, (d) => {return d.genre});
         
@@ -65,7 +66,7 @@ d3.csv("data/movies_metadata.csv").then(
         const tickMax = maxYear - maxYear%tickSize;
         const tickVals = Array.from({length: (tickMax - tickMin)/ tickSize + 1}, (value, index) => new Date(tickMin + index*tickSize, 0 , 1));
         const xScale = d3.scaleTime()
-                         .domain([new Date(`${tickMin}` + '-01-01'), new Date(`${tickMax}` + '-12-31')])
+                         .domain([new Date(`${minYear}` + '-01-01'), new Date(`${maxYear}` + '-12-31')])
                          .range([ dimensions.margin.left, dimensions.width - dimensions.margin.right]);
         const yScale = d3.scaleLinear()
                           .domain([0, d3.max(rev_data, function(d) { return +d.revenue; })])
