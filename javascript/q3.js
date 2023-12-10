@@ -354,7 +354,19 @@ d3.csv("data/movies_metadata.csv").then(function(dataset)
 							.style("stroke-dasharray", ("3, 3"))
 							.attr("fill", "none")
 							.attr("stroke", "black")
-							.attr("stroke-width", 1.0)
+							.attr("stroke-width", 3.0)
+							.on("mouseover", function(d, i){
+								d3.select(this)
+									.attr("opacity", .8)
+									.attr("r", 8);
+								text.text("Profitability Line");
+							})
+							.on("mouseout", function(){
+								d3.select(this)
+									.attr("opacity", 1)
+									.attr("r", 5);
+								text.text("");
+							})
 		});
 
 
